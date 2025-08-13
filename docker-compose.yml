@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+    # Database
+    postgres:
+        image: postgres:15-alpine
+        container_name: recruitment-postgres
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        networks:
+            - recruitment-network
+        ports:
+            - "5432:5432"
+
+    # Cache & Queues
+    redis:
+        image: redis:7-alpine
+        container_name: recruitment-redis
+        volumes:
+            - redis-data:/data
+        networks:
+            - recruitment-network
+        ports:
+            - "6379:6379"
+
+    # Redis GUI
+    redis-insight:
+        image: redislabs/redisinsight:latest
+        container_name: recruitment-redis-insight
+        ports:
+            - "8001:8001"
+        volumes:
+            - redisinsight-data:/db
+        networks:
+            - recruitment-network
+
+    # File Storage
+    minio:
+        image: minio/minio
+        container_name: recruitment-minio
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        environment:
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+        volumes:
+            - minio-data:/data
+        networks:
+            - recruitment-network
+        command: server /data --console-address ":9001"
+
+    # Laravel Application
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: recruitment-app
+        volumes:
+            - .:/var/www/html
+        environment:
+            DB_HOST: postgres
+            DB_PORT: 5432
+            REDIS_HOST: redis
+        networks:
+            - recruitment-network
+        depends_on:
+            - postgres
+            - redis
+            - minio
+
+    # Queue Worker
+    queue:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: recruitment-queue
+        command: php artisan queue:work --sleep=3 --tries=3
+        volumes:
+            - .:/var/www/html
+        environment:
+            DB_HOST: postgres
+            DB_PORT: 5432
+            REDIS_HOST: redis
+        networks:
+            - recruitment-network
+        depends_on:
+            - app
+            - redis
+
+    # Python AI Service
+    ai-service:
+        image: python:3.10-slim
+        container_name: recruitment-ai
+        volumes:
+            - ./ai:/app
+        working_dir: /app
+        command: uvicorn app:app --host 0.0.0.0 --port 5000
+        environment:
+            PYTHONPATH: /app
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "5000:5000"
+        networks:
+            - recruitment-network
+        depends_on:
+            - postgres
+
+volumes:
+    postgres-data:
+    redis-data:
+    redisinsight-data:
+    minio-data:
+
+
+networks:
+    recruitment-network:
+        driver: bridge
