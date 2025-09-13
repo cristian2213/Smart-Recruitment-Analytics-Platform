@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Enums\User\Gender;
 
 return new class extends Migration {
     /**
@@ -14,10 +15,43 @@ return new class extends Migration {
             $table->id();
             $table->string('uuid')->unique();
             $table->string('name');
+            $table->string('last_name')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->foreignId('created_by')->nullable()->constrained('users');
             $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('profiles', function (Blueprint $table) {
+            $table->id();
+            $table->string('display_name', 255);
+            $table->text('bio')->nullable();
+            $table->json('website_links')->nullable();
+            $table->date('birthday')->nullable();
+            $table->enum('gender', Gender::cases());
+            $table->json('languages')->nullable();
+            $table->json('education')->nullable();
+            $table->string('phone_number', 50)->nullable();
+            $table->json('skills')->nullable();
+            $table->timestamps();
+            $table->foreignId('user_id')->constrained('users')->noActionOnDelete();
+        });
+
+        Schema::create('resumes', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->noActionOnDelete();
+        });
+
+        Schema::create('files', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('fileable');
+            $table->string('path');
+            $table->string('name');
+            $table->string('extension');
+            $table->string('mime_type');
+            $table->string('size');
             $table->timestamps();
         });
 
@@ -43,6 +77,9 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('users');
+        Schema::dropIfExists('profiles');
+        Schema::dropIfExists('resumes');
+        Schema::dropIfExists('files');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

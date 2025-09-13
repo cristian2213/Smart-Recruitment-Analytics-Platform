@@ -1,0 +1,60 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use App\Enums\Job\JobStatus;
+use App\Enums\Job\ApplicationStatus;
+use App\Enums\Job\InterviewStatus;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('employments', function (Blueprint $table) {
+            $table->id();
+            $table->string('title', 255);
+            $table->text('description')->nullable();
+            $table->string('location', 255);
+            $table->json('skills');
+            $table->string('salary', 24)->nullable();
+            $table->enum('status', JobStatus::cases())->default(JobStatus::Draft);
+            $table->timestamps();
+            $table->foreignId('user_id')->constrained('users')->noActionOnDelete();
+            $table->foreignId('recruiter_id')->constrained('users')->noActionOnDelete();
+        });
+
+        Schema::create('applications', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid')->index();
+            $table->float('match_score')->default(0);
+            $table->enum('status', ApplicationStatus::cases())->default(ApplicationStatus::Pending);
+            $table->timestamps();
+            $table->foreignId('user_id')->constrained('users')->noActionOnDelete();
+            $table->foreignId('employment_id')->constrained('employments')->noActionOnDelete();
+        });
+
+        Schema::create('interviews', function (Blueprint $table) {
+            $table->id();
+            $table->date('date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('link');
+            $table->enum('was_confirmed', InterviewStatus::cases())->default(InterviewStatus::No);
+            $table->timestamps();
+            $table->foreignId('application_id')->constrained('applications')->noActionOnDelete();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('interviews');
+        Schema::dropIfExists('applications');
+        Schema::dropIfExists('employments');
+    }
+};

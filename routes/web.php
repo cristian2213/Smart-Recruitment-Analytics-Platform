@@ -25,13 +25,14 @@ Route::middleware('auth')->group(function () {
     // Can Notify everyone about something important
 
     // ROUTE: hr-manager/dashboard
-    // - Watch Analytics (Applicants Analytics, Jobs Analytics, Recruiter Analytics)
+    // - Watch, Create, Update, Delete Recruiters
     // - Watch, Create, Update, Delete (ONLY OWN) Jobs
     // --- Can assign, unassign a Recruiter to a Job
     // --- Can update a Job status (Draft, Published, Closed)
     // - Can see all Applicants and their Applications
     // - Can see the performance of his Recruiters
     // --- Can see Notes, Emails, Interviews sent by his Recruiters to Applicants
+    // - Watch Analytics (Applicants Analytics, Jobs Analytics, Recruiter Analytics)
 
     // ROUTE: recruiter/dashboard
     // - Watch Analytics
