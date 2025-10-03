@@ -8,7 +8,7 @@ use App\Enums\User\RoleEnum;
 class PermissionService
 {
     protected array $rolePermissions = [
-        RoleEnum::ADMIN->value => [
+        RoleEnum::Admin->value => [
             PermissionEnum::ViewUsers,
             PermissionEnum::CreateUsers,
             PermissionEnum::ReadUsers,
@@ -21,7 +21,7 @@ class PermissionService
             PermissionEnum::DeleteJobs,
         ],
 
-        RoleEnum::HR_MANAGER->value => [
+        RoleEnum::HRManager->value => [
             PermissionEnum::ViewJobs,
             PermissionEnum::CreateJobs,
             PermissionEnum::ReadJobs,
@@ -29,7 +29,7 @@ class PermissionService
             PermissionEnum::DeleteJobs,
         ],
 
-        RoleEnum::RECRUITER->value => [
+        RoleEnum::Recruiter->value => [
             PermissionEnum::ViewJobs,
             PermissionEnum::CreateJobs,
             PermissionEnum::ReadJobs,
@@ -37,26 +37,23 @@ class PermissionService
             PermissionEnum::DeleteJobs,
         ],
 
-        RoleEnum::APPLICANT->value => [
+        RoleEnum::Applicant->value => [
             PermissionEnum::ViewJobs,
         ],
     ];
 
     public function getRoles(): array
     {
-        return array_keys($this->rolePermissions);
+        return array_map(fn (RoleEnum $roleEnum): array => ['role' => $roleEnum->value], RoleEnum::cases());
     }
 
     public function getPermissions(): array
     {
-        $permissions = collect(PermissionEnum::cases());
-        $permCb = fn (PermissionEnum $permissionEnum): string => $permissionEnum->value;
-
-        return $permissions->map($permCb)->toArray();
+        return array_map(fn (PermissionEnum $permissionEnum): array => ['permission' => $permissionEnum->value], PermissionEnum::cases());
     }
 
     public function getPermissionsForRole(RoleEnum $role): array
     {
-        return $this->rolePermissions[$role->value] ?? [];
+        return array_map(fn (PermissionEnum $permissionEnum): array => ['permission' => $permissionEnum->value], $this->rolePermissions[$role->value] ?? []);
     }
 }

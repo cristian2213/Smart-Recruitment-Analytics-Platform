@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Enums\User\RoleEnum as UserRole;
+use App\Enums\User\RoleEnum;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Services\PermissionService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -18,45 +20,57 @@ class AuthorizationSeeder extends Seeder
      */
     public function run(): void
     {
+        if ($this->_checkIfRecordsExist()) {
+            return;
+        }
+
         $this->_createRoles();
         $this->_createPermissions();
         $this->_createRolePermissions();
     }
 
+    private function _checkIfRecordsExist(): bool
+    {
+        return Role::exists() && Permission::exists();
+    }
+
     private function _createRoles(): void
     {
         $roles = $this->permissionService->getRoles();
-        DB::table('roles')->upsert($roles, 'role', ['role']);
+        Role::insert($roles);
     }
 
     private function _createPermissions(): void
     {
         $permissions = $this->permissionService->getPermissions();
-        DB::table('permissions')->upsert($permissions, 'permission', ['permission']);
+        Permission::insert($permissions);
     }
 
     private function _createRolePermissions(): void
     {
-        $roles = DB::table('roles')->get();
+        $roles = Role::all();
+        foreach ($roles as $role) {
+            switch ($role->role) {
+                case RoleEnum::Admin->value:
+                    $raw_permissions = $this->permissionService->getPermissionsForRole(RoleEnum::Admin);
 
-        foreach ($roles as $role_obj) {
-            switch ($role_obj->role) {
-                case UserRole::Admin->value:
-                    $permissionsArr = $this->permissionService->getPermissionsForRole(UserRole::Admin);
-                    $permissions = DB::table('permissions')->pluck('id');
-                    $rolePermissions = array_map(fn ($permission) => ['role_id' => $role_obj->id, 'permission_id' => $permission], $permissions->toArray());
-                    DB::table('roles_permissions')->insert($rolePermissions);
+                    $permissions = Permission::whereIn('permission', $raw_permissions)
+                        ->pluck('id')
+                        ->map(fn ($permission) => ['role_id' => $role->id, 'permission_id' => $permission]);
+
+                    DB::table('roles_permissions')
+                        ->upsert($permissions->toArray(), ['role_id', 'permission_id'], ['role_id', 'permission_id']);
                     break;
 
-                case UserRole::HRManager->value:
+                case RoleEnum::HRManager->value:
                     // code...
                     break;
 
-                case UserRole::Recruiter->value:
+                case RoleEnum::Recruiter->value:
                     // code...
                     break;
 
-                case UserRole::Applicant->value:
+                case RoleEnum::Applicant->value:
                     // code...
                     break;
             }

@@ -15,13 +15,13 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->enum('role', RoleEnum::cases());
+            $table->enum('role', RoleEnum::cases())->unique();
             $table->string('description', 255)->nullable();
         });
 
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->enum('permission', PermissionEnum::cases());
+            $table->enum('permission', PermissionEnum::cases())->unique();
             $table->string('description', 255)->nullable();
         });
 
@@ -30,6 +30,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
+            $table->unique(['user_id', 'role_id']);
         });
 
         Schema::create('roles_permissions', function (Blueprint $table) {
@@ -37,6 +38,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
             $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
+            $table->unique(['role_id', 'permission_id']);
         });
     }
 

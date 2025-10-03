@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\User\RoleEnum;
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -47,30 +49,38 @@ class UserFactory extends Factory
     // function to adminRole, hrManagerRole, recruiterRole, applicantRole
     public function adminRole(): static
     {
+        $adminRole = Role::where('role', RoleEnum::Admin)->first();
+
         return $this->state(fn (array $attributes) => [
             'email' => 'admin@test.com',
             'created_by' => null,
-        ]);
+        ])->hasAttached($adminRole, ['created_at' => now()]);
     }
 
     public function hrManagerRole(): static
     {
+        $hrManagerRole = Role::where('role', RoleEnum::HRManager)->first();
+
         return $this->state(fn (array $attributes) => [
             'email' => 'hrmanager@test.com',
-        ]);
+        ])->hasAttached($hrManagerRole, ['created_at' => now()]);
     }
 
     public function recruiterRole(): static
     {
+        $recruiterRole = Role::where('role', RoleEnum::Recruiter)->first();
+
         return $this->state(fn (array $attributes) => [
             'email' => 'recruiter@test.com',
-        ]);
+        ])->hasAttached($recruiterRole, ['created_at' => now()]);
     }
 
     public function applicantRole(): static
     {
+        $applicantRole = Role::where('role', RoleEnum::Applicant)->first();
+
         return $this->state(fn (array $attributes) => [
             'email' => 'applicant@test.com',
-        ]);
+        ])->hasAttached($applicantRole, ['created_at' => now()]);
     }
 }
