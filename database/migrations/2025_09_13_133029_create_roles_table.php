@@ -1,12 +1,13 @@
 <?php
 
+use App\Enums\User\PermissionEnum;
+use App\Enums\User\RoleEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\User\Role;
-use App\Enums\User\Permission;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -14,13 +15,13 @@ return new class extends Migration {
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->enum('role', Role::cases());
+            $table->enum('role', RoleEnum::cases());
             $table->string('description', 255)->nullable();
         });
 
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->enum('permission', Permission::cases());
+            $table->enum('permission', PermissionEnum::cases());
             $table->string('description', 255)->nullable();
         });
 

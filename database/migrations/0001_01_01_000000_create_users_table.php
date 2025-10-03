@@ -1,11 +1,12 @@
 <?php
 
+use App\Enums\User\GenderEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\User\Gender;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -30,7 +31,7 @@ return new class extends Migration {
             $table->text('bio')->nullable();
             $table->json('website_links')->nullable();
             $table->date('birthday')->nullable();
-            $table->enum('gender', Gender::cases());
+            $table->enum('gender', GenderEnum::cases());
             $table->json('languages')->nullable();
             $table->json('education')->nullable();
             $table->string('phone_number', 50)->nullable();

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Enums\User\RoleEnum as UserRole;
 use App\Models\Role;
-use App\Enums\User\Role as UserRole;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {

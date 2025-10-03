@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\User\PermissionEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Role;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -37,7 +38,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'uuid'
+        'uuid',
     ];
 
     /**
@@ -51,6 +52,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Check if the user has a specific permission.
+     */
+    public function hasPermissionTo(PermissionEnum $permission): bool
+    {
+        return $this->getPermissions()->contains($permission->value);
+    }
+
+    public function getPermissions(): Collection
+    {
+        return $this->roles->first()->permissions->pluck('permission');
     }
 
     /**

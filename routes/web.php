@@ -1,14 +1,13 @@
 <?php
 
+use App\Http\Controllers\Dashboard\JobController;
+use App\Http\Controllers\Dashboard\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\Dashboard\JobController;
 
 Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
-
 
 Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
     Route::get('/', function () {
@@ -19,7 +18,6 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
 
     Route::resource('jobs', JobController::class)->names('dashboard.jobs');
 });
-
 
 // Route::middleware('auth')->group(function () {
 Route::middleware([])
@@ -34,7 +32,6 @@ Route::middleware([])
         // - Watch Analytics (Applicants Analytics, Jobs Analytics, Users Analytics)
         // Can see Notes, Emails, Interviews sent by his Recruiters to Applicants
         // Can Notify everyone about something important
-    
 
         // ROUTE: hr-manager/dashboard
         // - Watch, Create, Update, Delete Recruiters
@@ -45,7 +42,7 @@ Route::middleware([])
         // - Can see the performance of his Recruiters
         // --- Can see Notes, Emails, Interviews sent by his Recruiters to Applicants
         // - Watch Analytics (Applicants Analytics, Jobs Analytics, Recruiter Analytics)
-    
+
         // ROUTE: recruiter/dashboard
         // - Watch Analytics
         // --- Counts (Total Applicants, Total Jobs, Total Applications, Total Interviews, Total Hired, Total Rejected)
@@ -59,7 +56,7 @@ Route::middleware([])
         // He is Notified when:
         // --- He is assigned to a new Job
         // --- A new Applicant applies to his assigned Job
-    
+
         // ROUTE: applicant/dashboard
         // - Watch All applied Jobs
         // - Can Apply to a Job
@@ -75,11 +72,11 @@ Route::middleware([])
         // --- The Interview Results are available
         // --- Emails, Notes or Notifications is sent from the Recruiter
         // - Watch Analytics (Only own Applications)
-    
+
         // ROUTE: public/jobs
         // - Applicants can Apply to a Job
         // --- Can Upload a Resume, but needs to create an account first
     });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

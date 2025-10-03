@@ -1,13 +1,14 @@
 <?php
 
+use App\Enums\Job\ApplicationStatus;
+use App\Enums\Job\InterviewStatus;
+use App\Enums\Job\JobStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\Job\JobStatus;
-use App\Enums\Job\ApplicationStatus;
-use App\Enums\Job\InterviewStatus;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */

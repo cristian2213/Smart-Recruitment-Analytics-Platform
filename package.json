@@ -8,7 +8,10 @@
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
-        "types": "tsc --noEmit"
+        "types": "tsc --noEmit",
+        "pint:format": "./vendor/bin/pint",
+        "pint:test": "./vendor/bin/pint --test",
+        "pint:dirty": "./vendor/bin/pint --dirty"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",

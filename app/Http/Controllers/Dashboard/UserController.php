@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\User\PermissionEnum;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\User;
 
 class UserController extends Controller
 {
@@ -15,9 +17,12 @@ class UserController extends Controller
      */
     public function index(): Response
     {
+        Gate::authorize(PermissionEnum::ViewUsers->value, auth()->user());
+
         $users = User::paginate(10)->all();
+
         return Inertia::render('dashboard/users', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
