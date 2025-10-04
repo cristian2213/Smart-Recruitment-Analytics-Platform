@@ -54,6 +54,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function getPermissions(): Collection
+    {
+        return $this->roles->first()->permissions->pluck('permission');
+    }
+
     /**
      * Check if the user has a specific permission.
      */
@@ -62,10 +67,14 @@ class User extends Authenticatable
         return $this->getPermissions()->contains($permission->value);
     }
 
-    public function getPermissions(): Collection
+    public function getRole(): string
     {
-        return $this->roles->first()->permissions->pluck('permission');
+        return $this->roles->first()->role;
     }
+
+    // ***********************
+    // RELATIONSHIPS
+    // ***********************
 
     /**
      * Get the roles associated with the user.

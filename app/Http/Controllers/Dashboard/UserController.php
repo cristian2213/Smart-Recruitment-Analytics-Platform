@@ -3,23 +3,35 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Enums\User\PermissionEnum;
+use App\Enums\User\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\UserAccessTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class UserController extends Controller
 {
+    use UserAccessTrait;
+
     /**
      * Display a listing of the resource.
      */
     public function index(): Response
     {
-        Gate::authorize(PermissionEnum::ViewUsers->value, auth()->user());
+        $this->userCanOrFail(PermissionEnum::ViewUsers);
+        $role = $this->userRole();
 
-        $users = User::paginate(10)->all();
+        if ($this->isHRManager()) {
+            $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
+        }
+
+        $users = match ($role) {
+            RoleEnum::Admin->value => User::paginate(10),
+            RoleEnum::HRManager->value => User::where('created_by', $this->userId())->paginate(10),
+            default => [],
+        };
 
         return Inertia::render('dashboard/users', [
             'users' => $users,

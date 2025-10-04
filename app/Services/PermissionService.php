@@ -14,6 +14,7 @@ class PermissionService
             PermissionEnum::ReadUsers,
             PermissionEnum::UpdateUsers,
             PermissionEnum::DeleteUsers,
+
             PermissionEnum::ViewJobs,
             PermissionEnum::CreateJobs,
             PermissionEnum::ReadJobs,
@@ -22,23 +23,32 @@ class PermissionService
         ],
 
         RoleEnum::HRManager->value => [
+            PermissionEnum::ViewUsers,
+            PermissionEnum::CreateUsers,
+            PermissionEnum::ReadOwnUsers,
+            PermissionEnum::UpdateOwnUsers,
+            PermissionEnum::DeleteOwnUsers,
+
             PermissionEnum::ViewJobs,
             PermissionEnum::CreateJobs,
-            PermissionEnum::ReadJobs,
-            PermissionEnum::UpdateJobs,
-            PermissionEnum::DeleteJobs,
+            PermissionEnum::ReadOwnJobs,
+            PermissionEnum::UpdateOwnJobs,
+            PermissionEnum::DeleteOwnJobs,
+
         ],
 
         RoleEnum::Recruiter->value => [
             PermissionEnum::ViewJobs,
-            PermissionEnum::CreateJobs,
             PermissionEnum::ReadJobs,
-            PermissionEnum::UpdateJobs,
-            PermissionEnum::DeleteJobs,
+            PermissionEnum::UpdateJobsStatus,
         ],
 
         RoleEnum::Applicant->value => [
-            PermissionEnum::ViewJobs,
+            PermissionEnum::ViewApplications,
+            PermissionEnum::CreateApplications,
+            PermissionEnum::ReadOwnApplications,
+            PermissionEnum::UpdateOwnApplications,
+            PermissionEnum::DeleteOwnApplications,
         ],
     ];
 
