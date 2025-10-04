@@ -1,6 +1,6 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type User } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -10,11 +10,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-interface UsersProps {
-  users: User[];
-}
-
-export default function Users({ _users }: UsersProps) {
+export default function User() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Users" />
