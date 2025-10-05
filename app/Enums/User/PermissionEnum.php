@@ -4,10 +4,11 @@ namespace App\Enums\User;
 
 enum PermissionEnum: string
 {
-    // view_<any> gives access to the module (menu item)
-    case ViewUsers = 'view_users';
+    case ViewUsers = 'view_users'; // view
+    case ViewShowUser = 'view_show_user';
+    case ViewEditUser = 'view_edit_user';
     // global users
-    case CreateUsers = 'create_users';
+    case CreateUsers = 'create_users'; // actions 👇
     case ReadUsers = 'read_users';
     case ReadOwnUsers = 'read_own_users';
     case UpdateUsers = 'update_users';
@@ -15,8 +16,8 @@ enum PermissionEnum: string
     case DeleteUsers = 'delete_users';
     case DeleteOwnUsers = 'delete_own_users';
 
-    case ViewJobs = 'view_jobs';
-    case CreateJobs = 'create_jobs';
+    case ViewJobs = 'view_jobs'; // view
+    case CreateJobs = 'create_jobs'; // actions 👇
     case ReadJobs = 'read_jobs';
     case ReadOwnJobs = 'read_own_jobs';
     case UpdateJobs = 'update_jobs';
@@ -25,8 +26,8 @@ enum PermissionEnum: string
     case DeleteJobs = 'delete_jobs';
     case DeleteOwnJobs = 'delete_own_jobs';
 
-    case ViewApplications = 'view_applications';
-    case CreateApplications = 'create_applications';
+    case ViewApplications = 'view_applications'; // view
+    case CreateApplications = 'create_applications'; // actions 👇
     case ReadApplications = 'read_applications';
     case ReadOwnApplications = 'read_own_applications';
     case UpdateApplications = 'update_applications';

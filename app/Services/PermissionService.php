@@ -10,6 +10,8 @@ class PermissionService
     protected array $rolePermissions = [
         RoleEnum::Admin->value => [
             PermissionEnum::ViewUsers,
+            PermissionEnum::ViewShowUser,
+            PermissionEnum::ViewEditUser,
             PermissionEnum::CreateUsers,
             PermissionEnum::ReadUsers,
             PermissionEnum::UpdateUsers,
@@ -24,6 +26,8 @@ class PermissionService
 
         RoleEnum::HRManager->value => [
             PermissionEnum::ViewUsers,
+            PermissionEnum::ViewShowUser,
+            PermissionEnum::ViewEditUser,
             PermissionEnum::CreateUsers,
             PermissionEnum::ReadOwnUsers,
             PermissionEnum::UpdateOwnUsers,

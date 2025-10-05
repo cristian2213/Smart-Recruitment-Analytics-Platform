@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Dashboard;
 use App\Enums\User\PermissionEnum;
 use App\Enums\User\RoleEnum;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\User\UserUpdateRequest;
+use App\Http\Requests\User\UserRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Traits\UserAccessTrait;
+use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,7 +45,7 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(UserRequest $request): RedirectResponse
     {
         $this->userCanOrFail(PermissionEnum::CreateUsers);
 
@@ -63,6 +63,7 @@ class UserController extends Controller
         $user = User::create($validated);
         $role = Role::where('role', $validated['role'])->first();
         $user->roles()->attach($role->id);
+        $user->sendEmailVerificationNotification();
 
         return back()->with('success', 'User created successfully.');
     }
@@ -70,18 +71,51 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $uuid): RedirectResponse|Response
+    public function show(string $id): RedirectResponse|Response
     {
+        $this->userCanOrFail(PermissionEnum::ViewShowUser);
+
         if ($this->isAdmin()) {
             $this->userCanOrFail(PermissionEnum::ReadUsers);
-            $user = User::where('uuid', $uuid)->first();
+            $user = User::where('uuid', $id)->first();
         }
 
         if ($this->isHRManager()) {
             $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
             $user = User::where([
                 'created_by' => $this->userId(),
-                'uuid' => $uuid,
+                'uuid' => $id,
+            ])->first();
+        }
+
+        if (! $user) {
+            // throw new Exception('User not found.');
+            return back()->with('error', 'User not found.');
+        }
+
+        return Inertia::render('dashboard/user', [
+            'user' => $user,
+            'mode' => 'show',
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id, UserRequest $request)
+    {
+        $this->userCanOrFail(PermissionEnum::ViewEditUser);
+
+        if ($this->isAdmin()) {
+            $this->userCanOrFail(PermissionEnum::ReadUsers);
+            $user = User::where('uuid', $id)->first();
+        }
+
+        if ($this->isHRManager()) {
+            $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
+            $user = User::where([
+                'created_by' => $this->userId(),
+                'uuid' => $id,
             ])->first();
         }
 
@@ -91,23 +125,58 @@ class UserController extends Controller
 
         return Inertia::render('dashboard/user', [
             'user' => $user,
+            'mode' => 'edit',
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id, UserUpdateRequest $request)
-    {
-        //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UserRequest $request, string $id)
     {
-        //
+        if (
+            ! $this->userCan(PermissionEnum::UpdateUsers) &&
+            ! $this->userCan(PermissionEnum::UpdateOwnUsers)
+        ) {
+            return back()->with('error', 'You do not have permission to update this user.');
+        }
+
+        $validated = $request->validated();
+        if ($this->isAdmin()) {
+            $user = User::where('uuid', $id)->first();
+        }
+
+        if ($this->isHRManager()) {
+            $user = User::where([
+                'uuid' => $id,
+                'created_by' => $this->userId(),
+            ])->first();
+        }
+
+        if (! $user) {
+            return back()->with('error', 'User not found.');
+        }
+
+        if (
+            $validated['email'] &&
+            $validated['email'] != $user->email
+        ) {
+            $emailExists = User::where('email', $validated['email'])->first();
+            if ($emailExists) {
+                return back()->with('error', 'Email already exists.');
+            }
+            $user->email = $validated['email'];
+            $user->save();
+            $user->sendEmailVerificationNotification();
+        }
+
+        if ($validated['password']) {
+            $validated['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($validated);
+
+        return back()->with('success', 'User updated successfully.');
     }
 
     /**
@@ -115,6 +184,30 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if (
+            ! $this->userCan(PermissionEnum::DeleteUsers) &&
+            ! $this->userCan(PermissionEnum::DeleteOwnUsers)
+        ) {
+            return back()->with('error', 'You do not have permission to delete this user.');
+        }
+
+        if ($this->isAdmin()) {
+            $user = User::where('uuid', $id)->first();
+        }
+
+        if ($this->isHRManager()) {
+            $user = User::where([
+                'uuid' => $id,
+                'created_by' => $this->userId(),
+            ])->first();
+        }
+
+        if (! $user) {
+            return back()->with('error', 'User not found.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'User deleted successfully.');
     }
 }
