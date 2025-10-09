@@ -16,9 +16,6 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
-    // change the default pk
-    protected $primaryKey = 'uuid';
-
     /**
      * The attributes that are mass assignable.
      *
@@ -43,7 +40,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'uuid',
+        'created_at',
+        'deleted_at',
     ];
 
     /**
@@ -57,6 +55,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 
     public function getPermissions(): Collection
