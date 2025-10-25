@@ -1,0 +1,11 @@
+#!/bin/bash
+# Run PHP tools only if available
+if command -v php >/dev/null 2>&1 && [ -f vendor/bin/pint ]; then
+    ./vendor/bin/pint --dirty
+else
+    echo "PHP or Pint not available, skipping PHP formatting"
+fi
+
+# JavaScript tools (assuming Node.js is required for the project)
+pnpm lint
+pnpm format
