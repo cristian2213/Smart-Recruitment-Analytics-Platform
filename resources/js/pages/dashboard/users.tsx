@@ -9,10 +9,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type User } from '@/types';
+import { type BreadcrumbItem, type Link, type User } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
+import { Ellipsis, MoreHorizontal } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -24,10 +24,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface UsersProps {
   users: {
     data: User[];
+    links: Link[];
   };
 }
 
-export const columns: ColumnDef<User>[] = [
+const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'id',
     header: 'ID',
@@ -70,9 +71,13 @@ export const columns: ColumnDef<User>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuItem>Delete</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.uuid)}>Copy ID</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.uuid)}>
+              Copy ID
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>More</DropdownMenuItem>
+            <DropdownMenuItem>
+              More <Ellipsis />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -81,26 +86,12 @@ export const columns: ColumnDef<User>[] = [
 ];
 
 export default function Users({ users }: UsersProps) {
-  console.log('users', users);
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Users" />
       <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          {/* <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-          </div>
-          <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-          </div>
-          <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-          </div> */}
-          TABLE HEADER
-        </div>
-        <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-          {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
-          <DataTable columns={columns} data={users.data} />
+        <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 px-4 py-5 md:min-h-min dark:border-sidebar-border">
+          <DataTable columns={columns} data={users.data} links={users.links} />
         </div>
       </div>
     </AppLayout>

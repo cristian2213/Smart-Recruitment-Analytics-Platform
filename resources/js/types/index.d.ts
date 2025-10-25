@@ -53,3 +53,10 @@ export interface Job {
   created_at: string;
   updated_at: string;
 }
+
+export interface Link {
+  active: boolean;
+  label: string;
+  page: number;
+  url: string;
+}
