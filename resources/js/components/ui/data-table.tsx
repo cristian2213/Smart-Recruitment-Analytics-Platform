@@ -2,9 +2,54 @@ import { useState } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from './dropdown-menu';
-import { Button } from './button';
 import { DataTablePagination } from '@/components/data-table-pagination';
 import { type Link } from '@/types'
+import { Button } from "@/components/ui/button"
+import { DynamicForm, type DynamicFormInputProps } from '@/components/dynamic-form'
+import * as z from 'zod';
+
+const formValidation = z.object({
+  name: z
+    .string()
+    .min(2, 'First name must be at least 2 characters.')
+    .max(32, 'name must be at most 32 characters.'),
+  last_name: z
+    .string()
+    .min(2, 'Last name must be at least 2 characters.')
+    .max(32, 'Last name must be at most 32 characters.'),
+  email: z.email('Invalid email address.')
+});
+
+// name, last_name, email
+const formInputs: DynamicFormInputProps[] = [
+  {
+    name: 'name',
+    label: 'First name',
+    placeholder: 'Enter first name',
+    htmlElement: 'input',
+    type: 'text',
+  },
+  {
+    name: 'last_name',
+    label: 'Last name',
+    placeholder: 'Enter last name',
+    htmlElement: 'input',
+    type: 'text',
+  },
+  {
+    name: 'email',
+    label: 'Email',
+    placeholder: 'Enter email',
+    htmlElement: 'input',
+    type: 'email',
+  },
+]
+
+const formDefValues = {
+  name: 'asdfasdf',
+  last_name: 'asdfasdf',
+  email: 'adsfasdfq@gmail.com',
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,7 +90,8 @@ export function DataTable<TData, TValue>({ columns, data, links }: DataTableProp
     })
   }
 
-  return (
+  return (<>
+    <DynamicForm inputs={formInputs} schema={formValidation} defaultValues={formDefValues}  />
     <div className="overflow-hidden rounded-md flex flex-col">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -93,5 +139,6 @@ export function DataTable<TData, TValue>({ columns, data, links }: DataTableProp
         <DataTablePagination links={links} />
       </div>
     </div>
+    </>
   );
 }
