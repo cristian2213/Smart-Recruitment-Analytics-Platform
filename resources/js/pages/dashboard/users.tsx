@@ -1,5 +1,5 @@
+import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/ui/data-table';
 import {
   DropdownMenu,
   DropdownMenuContent,

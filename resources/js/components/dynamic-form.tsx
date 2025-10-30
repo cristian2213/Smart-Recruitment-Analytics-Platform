@@ -1,12 +1,3 @@
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   Field,
   FieldDescription,
@@ -30,17 +21,16 @@ import {
 } from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import * as z from 'zod';
 
-type InputType =
-  | 'text'
-  | 'email'
-  | 'password'
-  | 'number'
-  | 'select'
-  | 'checkbox'
-  | 'radio';
+// type InputType =
+//   | 'text'
+//   | 'email'
+//   | 'password'
+//   | 'number'
+//   | 'select'
+//   | 'checkbox'
+//   | 'radio';
 // type InputElement = 'input' | 'textarea' | 'select';
 
 // interface InputProps {
@@ -71,29 +61,14 @@ interface FormDataProps {
   inputs: DynamicFormInputProps[];
   defaultValues?: { [key: string]: string | number };
   schema: any;
+  onSubmit: (data: any, form?: any) => void;
 }
 
-function DynamicForm({ inputs, defaultValues, schema }: FormDataProps) {
+function DynamicForm({ inputs, defaultValues, schema, onSubmit }: FormDataProps) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues,
   });
-
-  function onSubmit(data: z.infer<typeof schema>) {
-    // data is valid here
-
-    toast('Event has been created', {
-      description: 'Sunday, December 03, 2023 at 9:00 AM',
-      // action: {
-      //   label: 'Undo',
-      //   onClick: () => console.log('Undo'),
-      // },
-      cancel: {
-        label: 'Undo',
-        onClick: () => console.log('Undo'),
-      },
-    });
-  }
 
   const createForm = () => {
     return inputs.map((input) => {
@@ -196,79 +171,12 @@ function DynamicForm({ inputs, defaultValues, schema }: FormDataProps) {
     });
   };
 
-  return (
-    <Card className="w-full sm:max-w-md">
-      <CardHeader>
-        <CardTitle>Bug Report</CardTitle>
-        <CardDescription>
-          Help us improve by reporting bugs you encounter.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            {createForm()}
+  const handleSubmit = (data: any) => onSubmit(data, form);
 
-            {/* <Controller
-              name="title"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">Bug Title</FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-rhf-demo-title"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Login button not working on mobile"
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name="description"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-description">Description</FieldLabel>
-                  <InputGroup>
-                    <InputGroupTextarea
-                      {...field}
-                      id="form-rhf-demo-description"
-                      placeholder="I'm having an issue with the login button on mobile."
-                      rows={6}
-                      className="min-h-24 resize-none"
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <InputGroupAddon align="block-end">
-                      <InputGroupText className="tabular-nums">
-                        {field.value?.length}/100 characters
-                      </InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  <FieldDescription>
-                    Include steps to reproduce, expected behavior, and what actually
-                    happened.
-                  </FieldDescription>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            /> */}
-          </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter>
-        <Field orientation="horizontal">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
-            Reset
-          </Button>
-          <Button type="submit" form="form-rhf-demo">
-            Submit
-          </Button>
-        </Field>
-      </CardFooter>
-    </Card>
+  return (
+    <form id="dynamic-form" onSubmit={form.handleSubmit(handleSubmit)}>
+      <FieldGroup>{createForm()}</FieldGroup>
+    </form>
   );
 }
 
