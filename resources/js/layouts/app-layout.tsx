@@ -14,7 +14,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
   return (
     <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
       {children}
-      <Toaster theme={appearance} />
+      <Toaster theme={appearance} position="top-right" />
     </AppLayoutTemplate>
   );
 };

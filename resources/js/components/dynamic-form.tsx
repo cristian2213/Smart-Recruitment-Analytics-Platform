@@ -152,7 +152,7 @@ function DynamicForm({ inputs, defaultValues, schema, onSubmit }: FormDataProps)
                     aria-invalid={fieldState.invalid}
                     className="min-w-[120px]"
                   >
-                    <SelectValue placeholder="Select" />
+                    <SelectValue placeholder={placeholder} />
                   </SelectTrigger>
                   <SelectContent position="item-aligned">
                     {options?.map((option) => (
@@ -175,7 +175,7 @@ function DynamicForm({ inputs, defaultValues, schema, onSubmit }: FormDataProps)
 
   return (
     <form id="dynamic-form" onSubmit={form.handleSubmit(handleSubmit)}>
-      <FieldGroup>{createForm()}</FieldGroup>
+      <FieldGroup className="gap-4">{createForm()}</FieldGroup>
     </form>
   );
 }

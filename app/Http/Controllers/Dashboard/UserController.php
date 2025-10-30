@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Str;
 
 class UserController extends Controller
 {
@@ -31,12 +32,12 @@ class UserController extends Controller
         }
 
         $users = match ($role) {
-            RoleEnum::Admin->value => User::paginate(10),
-            RoleEnum::HRManager->value => User::where('created_by', $this->userId())->paginate(10),
+            RoleEnum::Admin->value => User::latest()->paginate(10),
+            RoleEnum::HRManager->value => User::where('created_by', $this->userId())->latest()->paginate(10),
             default => [],
         };
 
-        return Inertia::render('dashboard/users', [
+        return Inertia::render('dashboard/users/index', [
             'users' => $users,
         ]);
     }
@@ -50,7 +51,8 @@ class UserController extends Controller
 
         $validated = $request->validated();
         $validated['created_by'] = $this->userId();
-        $validated['password'] = Hash::make($validated['password']);
+        $validated['password'] = Hash::make(Str::random(12));
+        $validated['uuid'] = Str::uuid()->toString();
 
         if (
             $this->isHRManager() &&

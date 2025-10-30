@@ -32,7 +32,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { type Link } from '@/types';
-import { useForm } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import {
   ColumnDef,
   flexRender,
@@ -55,6 +55,24 @@ const formValidation = z.object({
     .min(2, 'Last name must be at least 2 characters.')
     .max(32, 'Last name must be at most 32 characters.'),
   email: z.email('Invalid email address.'),
+  // 'nullable', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters.')
+    .max(64, 'Password must be at most 64 characters.')
+    .refine((password) => /[a-z]/.test(password), {
+      message: 'Password must contain at least one lowercase letter.',
+    })
+    .refine((password) => /[A-Z]/.test(password), {
+      message: 'Password must contain at least one uppercase letter.',
+    })
+    .refine((password) => /[0-9]/.test(password), {
+      message: 'Password must contain at least one number.',
+    })
+    .refine((password) => /[!@#$%^&*(),.?":{}|<>]/.test(password), {
+      message: 'Password must contain at least one special character.',
+    }),
+  role: z.string().min(1, 'Role is required.'),
 });
 
 // name, last_name, email
@@ -80,19 +98,39 @@ const formInputs: DynamicFormInputProps[] = [
     htmlElement: 'input',
     type: 'email',
   },
+  {
+    name: 'password',
+    label: 'Password',
+    placeholder: 'Enter password',
+    htmlElement: 'input',
+    type: 'password',
+  },
+  {
+    name: 'role',
+    label: 'Role',
+    placeholder: 'Select role',
+    htmlElement: 'select',
+    type: 'email',
+    options: [
+      {
+        value: 'admin',
+        label: 'Admin',
+      },
+      {
+        value: 'hr_manager',
+        label: 'HR Manager',
+      },
+      {
+        value: 'recruiter',
+        label: 'Recruiter',
+      },
+      {
+        value: 'applicant',
+        label: 'Applicant',
+      },
+    ],
+  },
 ];
-
-const formDefValues = {
-  name: 'asdfasdf',
-  last_name: 'asdfasdf',
-  email: 'adsfasdfq@gmail.com',
-};
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  links: Link[];
-}
 
 enum ActionTypeEnum {
   CREATE = 'create',
@@ -102,21 +140,19 @@ enum ActionTypeEnum {
   REDO = 'redo',
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  links,
-}: DataTableProps<TData, TValue>) {
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+interface DataTableHeaderProps {
+  table: any;
+}
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      columnVisibility,
-    },
+function DataTableHeader({ table }: DataTableHeaderProps) {
+  const page = usePage();
+  const [showCreationForm, setCreationForm] = useState(false);
+  const [formDefValues, setFormDefValues] = useState({
+    name: 'Test User',
+    last_name: 'Test Lastname',
+    email: 'user-test@gmail.com',
+    password: 'Admin123@#A',
+    role: '',
   });
 
   const getVisibleColumns = () => {
@@ -137,68 +173,70 @@ export function DataTable<TData, TValue>({
       });
   };
 
-  const DataTableHeader = () => {
-    const [showCreationForm, setCreationForm] = useState(false);
-    const { setData, post, processing, errors, reset } = useForm();
+  const handleNewRecord = (data: z.infer<typeof formValidation>, form: UseFormReturn) => {
+    setFormDefValues(data);
 
-    const handleActions = (
-      event: React.MouseEvent<HTMLDivElement | HTMLButtonElement>,
-    ) => {
-      const action = (event.target as HTMLElement)?.getAttribute('data-action');
+    router.post(page.url, data, {
+      preserveState: true,
+      onSuccess: () => {
+        toast.success('New record created', {
+          description: 'The new record has been successfully created.',
+          // cancel: {
+          //   label: 'Undo',
+          //   onClick: () => console.log('Undo'),
+          // },
+        });
+        form.reset();
+        // setFormDefValues({});
+      },
+      onError: (errors) => {
+        for (const [key, error] of Object.entries(errors)) {
+          form.setError(key as keyof typeof formDefValues, { message: error });
+        }
+      },
+    });
+  };
 
-      switch (action) {
-        case ActionTypeEnum.CREATE:
-          console.log('Create action');
-          // setCreationForm(false);
-          break;
-        case ActionTypeEnum.EDIT:
-          break;
-        case ActionTypeEnum.DELETE:
-          break;
-        case ActionTypeEnum.UNDO:
-          break;
-        case ActionTypeEnum.REDO:
-          break;
+  return (
+    <div className="mb-4 flex justify-start">
+      {/* ****** BLOCK CODE TO ATTACH DIALOGS COMPONENTS ****** */}
+      <Dialog open={showCreationForm} onOpenChange={setCreationForm} modal={true}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create a new Record</DialogTitle>
+            <DialogDescription>
+              Fill the details for the new record. Click save when you&apos;re done.
+            </DialogDescription>
+          </DialogHeader>
 
-        default:
-          break;
-      }
-    };
+          <DynamicForm
+            inputs={formInputs}
+            schema={formValidation}
+            defaultValues={formDefValues}
+            onSubmit={handleNewRecord}
+          />
 
-    const handleNewRecord = (
-      data: z.infer<typeof formValidation>,
-      form: UseFormReturn,
-    ) => {
-      setData(data);
-      post('/users', {
-        onSuccess: () => {
-          toast('New record created', {
-            description: 'The new record has been successfully created.',
-            cancel: {
-              label: 'Undo',
-              onClick: () => console.log('Undo'),
-            },
-          });
-          reset();
-          setCreationForm(false);
-        },
-        onError: (errors) => {
-          console.log('Error creating event:', errors);
-        },
-      });
-    };
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit" form="dynamic-form">
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* ****** END BLOCK CODE TO ATTACH DIALOGS COMPONENTS ****** */}
 
-    return (
-      <div className="mb-4 flex justify-start">
-        <div>
-          <Menubar>
-            <MenubarMenu>
-              <MenubarTrigger>Actions</MenubarTrigger>
-              <MenubarContent>
-                <MenubarItem onClick={() => setCreationForm(!showCreationForm)}>
-                  Create <MenubarShortcut>⌘C</MenubarShortcut>
-                </MenubarItem>
-                <MenubarItem data-action={ActionTypeEnum.DELETE} onClick={handleActions}>
+      <div>
+        <Menubar>
+          <MenubarMenu>
+            <MenubarTrigger>Actions</MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem onClick={() => setCreationForm((preVal) => !preVal)}>
+                Create <MenubarShortcut>⌘C</MenubarShortcut>
+              </MenubarItem>
+              {/* <MenubarItem data-action={ActionTypeEnum.DELETE} onClick={handleActions}>
                   Delete <MenubarShortcut>⌘X</MenubarShortcut>
                 </MenubarItem>
                 <MenubarSeparator />
@@ -207,8 +245,9 @@ export function DataTable<TData, TValue>({
                 </MenubarItem>
                 <MenubarItem data-action={ActionTypeEnum.REDO} onClick={handleActions}>
                   Redo <MenubarShortcut>⇧⌘Y</MenubarShortcut>
-                </MenubarItem>
-                {/* <MenubarSub>
+                </MenubarItem> */}
+
+              {/* <MenubarSub>
                   <MenubarSubTrigger>Find</MenubarSubTrigger>
                   <MenubarSubContent>
                     <MenubarItem>Search the web</MenubarItem>
@@ -218,78 +257,68 @@ export function DataTable<TData, TValue>({
                     <MenubarItem>Find Previous</MenubarItem>
                   </MenubarSubContent>
                 </MenubarSub> */}
-                {/* <MenubarSeparator /> */}
-              </MenubarContent>
-            </MenubarMenu>
+              {/* <MenubarSeparator /> */}
+            </MenubarContent>
+          </MenubarMenu>
 
-            <MenubarMenu>
-              <MenubarTrigger>File</MenubarTrigger>
-              <MenubarContent>
-                <MenubarItem>
-                  Export Data <MenubarShortcut>⌘T</MenubarShortcut>
-                </MenubarItem>
-                <MenubarSub>
-                  <MenubarSubTrigger>Share</MenubarSubTrigger>
-                  <MenubarSubContent>
-                    <MenubarItem>Email link</MenubarItem>
-                    <MenubarItem disabled>Messages</MenubarItem>
-                  </MenubarSubContent>
-                </MenubarSub>
-                <MenubarSeparator />
-                <MenubarItem>
-                  Print... <MenubarShortcut>⌘P</MenubarShortcut>
-                </MenubarItem>
-              </MenubarContent>
-            </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger>File</MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem>
+                Export Data <MenubarShortcut>⌘T</MenubarShortcut>
+              </MenubarItem>
+              <MenubarSub>
+                <MenubarSubTrigger>Share</MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarItem>Email link</MenubarItem>
+                  <MenubarItem disabled>Messages</MenubarItem>
+                </MenubarSubContent>
+              </MenubarSub>
+              <MenubarSeparator />
+              <MenubarItem>
+                Print... <MenubarShortcut>⌘P</MenubarShortcut>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
 
-            <MenubarMenu>
-              <MenubarTrigger>Columns</MenubarTrigger>
-              <MenubarContent>{getVisibleColumns()}</MenubarContent>
-            </MenubarMenu>
-          </Menubar>
-        </div>
-        <div>{/* filters */}</div>
-
-        <Dialog open={showCreationForm} onOpenChange={setCreationForm}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Create a new Record</DialogTitle>
-              <DialogDescription>
-                Fill the details for the new record. Click save when you&apos;re done.
-              </DialogDescription>
-            </DialogHeader>
-
-            <DynamicForm
-              inputs={formInputs}
-              schema={formValidation}
-              defaultValues={formDefValues}
-              onSubmit={handleNewRecord}
-            />
-
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="submit" form="dynamic-form">
-                Create
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          <MenubarMenu>
+            <MenubarTrigger>Columns</MenubarTrigger>
+            <MenubarContent>{getVisibleColumns()}</MenubarContent>
+          </MenubarMenu>
+        </Menubar>
       </div>
-    );
-  };
-
-  const DataTableFooter = () => (
-    <div className="mt-4">
-      <DataTablePagination links={links} />
+      <div>{/* filters */}</div>
     </div>
   );
+}
+
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  links: Link[];
+}
+
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  links,
+}: DataTableProps<TData, TValue>) {
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      columnVisibility,
+    },
+  });
 
   return (
     <>
       <div className="flex flex-col overflow-hidden rounded-md">
-        <DataTableHeader />
+        <DataTableHeader table={table} />
 
         <Table>
           <TableHeader>
@@ -328,7 +357,9 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
 
-        <DataTableFooter />
+        <div className="mt-4">
+          <DataTablePagination links={links} />
+        </div>
       </div>
     </>
   );

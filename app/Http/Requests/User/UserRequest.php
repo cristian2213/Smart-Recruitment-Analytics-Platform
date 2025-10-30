@@ -15,6 +15,9 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         $httpVerb = request()->getMethod();
+        // 'password' => [
+        //         'nullable', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
+        //     ],
         $rules = [
             'name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['nullable', 'string', 'max:100'],
@@ -22,7 +25,7 @@ class UserRequest extends FormRequest
                 'nullable', 'string', 'email', 'max:255', 'unique:users',
             ],
             'password' => [
-                'nullable', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
+                'nullable', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
             ],
             'created_at' => ['nullable', 'timezone:all'],
         ];
