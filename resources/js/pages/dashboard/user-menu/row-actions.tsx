@@ -1,13 +1,4 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { ConfirmationAlert } from '@/components/confirmation-alert';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -25,39 +16,6 @@ import { type CellContext } from '@tanstack/react-table';
 import { Ellipsis, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
-interface ConfirmationAlertProps {
-  title: string;
-  description: string;
-  isOpen: boolean;
-  onOpen: (open: boolean) => void;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
-
-function ConfirmationAlert({
-  title,
-  description,
-  isOpen,
-  onOpen,
-  onConfirm,
-  onCancel,
-}: ConfirmationAlertProps) {
-  return (
-    <AlertDialog open={isOpen} onOpenChange={onOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
 
 function RowActions(props: CellContext<User, unknown>) {
   const page = usePage(); // development purpose
