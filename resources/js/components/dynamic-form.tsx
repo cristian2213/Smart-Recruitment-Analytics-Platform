@@ -22,21 +22,24 @@ import {
 import { type DynamicFormInputProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 interface FormDataProps<TFormSchema> {
   inputs: DynamicFormInputProps[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   schema: any;
-  defaultValues: any;
-  onSubmit: (data: any, form: UseFormReturn) => void;
+  defaultValues: z.infer<TFormSchema>;
+  onSubmit: (data: z.infer<TFormSchema>, form: UseFormReturn) => void;
 }
 
-function DynamicForm<TFormSchema>({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DynamicForm<TFormSchema extends z.ZodType<any>>({
   inputs,
   defaultValues,
   schema,
   onSubmit,
 }: FormDataProps<TFormSchema>) {
-  const form = useForm({
+  const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues,
   });
@@ -142,7 +145,7 @@ function DynamicForm<TFormSchema>({
     });
   };
 
-  const handleSubmit = (data: any) => onSubmit(data, form);
+  const handleSubmit = (data: z.infer<TFormSchema>) => onSubmit(data, form);
 
   return (
     <form id="dynamic-form" onSubmit={form.handleSubmit(handleSubmit)}>

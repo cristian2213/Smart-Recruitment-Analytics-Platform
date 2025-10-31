@@ -1,15 +1,5 @@
 import { DataTablePagination } from '@/components/data-table-pagination';
 import { DynamicForm } from '@/components/dynamic-form';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -44,6 +34,7 @@ import { useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import { Modal } from './modal';
 
 interface DataTableHeaderProps<TData, TFormSchema> {
   table: ITable<TData>;
@@ -105,34 +96,16 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType<any>>({
 
   return (
     <div className="mb-4 flex justify-start">
-      {/* ****** BLOCK CODE TO ATTACH DIALOGS COMPONENTS ****** */}
-      <Dialog open={showCreationForm} onOpenChange={setCreationForm} modal={true}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Create a new Record</DialogTitle>
-            <DialogDescription>
-              Fill the details for the new record. Click save when you&apos;re done.
-            </DialogDescription>
-          </DialogHeader>
-
-          <DynamicForm<TFormSchema>
-            inputs={actions.create.formInputs}
-            schema={actions.create.schema}
-            defaultValues={formDefValues}
-            onSubmit={handleNewRecord}
-          />
-
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button type="submit" form="dynamic-form">
-              Create
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      {/* ****** END BLOCK CODE TO ATTACH DIALOGS COMPONENTS ****** */}
+      {/* ****** BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
+      <Modal isOpen={showCreationForm} onOpenChange={setCreationForm}>
+        <DynamicForm<TFormSchema>
+          inputs={actions.create.formInputs}
+          schema={actions.create.schema}
+          defaultValues={formDefValues}
+          onSubmit={handleNewRecord}
+        />
+      </Modal>
+      {/* ****** END BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
 
       <div>
         <Menubar>
