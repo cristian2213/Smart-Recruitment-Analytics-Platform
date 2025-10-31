@@ -37,7 +37,7 @@ class UserController extends Controller
             default => [],
         };
 
-        return Inertia::render('dashboard/users/index', [
+        return Inertia::render('dashboard/user-menu/users', [
             'users' => $users,
         ]);
     }

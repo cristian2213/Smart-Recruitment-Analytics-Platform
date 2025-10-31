@@ -19,53 +19,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { type DynamicFormInputProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Controller, useForm, type UseFormReturn } from 'react-hook-form';
 
-// type InputType =
-//   | 'text'
-//   | 'email'
-//   | 'password'
-//   | 'number'
-//   | 'select'
-//   | 'checkbox'
-//   | 'radio';
-// type InputElement = 'input' | 'textarea' | 'select';
-
-// interface InputProps {
-//   // element: InputElement;
-//   type: InputType;
-//   label: string;
-//   placeholder?: string;
-//   required?: boolean;
-//   options?: { value: string; label: string }[];
-// }
-
-// interface FormDataProps<T extends z.ZodRawShape> {
-//   inputs: InputProps[];
-//   defaultValues: { [key: string]: string };
-//   schema: z.ZodObject<T>;
-// }
-
-interface DynamicFormInputProps {
-  name: string;
-  htmlElement: 'input' | 'textarea' | 'select';
-  type: 'text' | 'password' | 'email';
-  label: string;
-  placeholder?: string;
-  options?: { value: string; label: string }[];
-}
-
-interface FormDataProps {
+interface FormDataProps<TFormSchema> {
   inputs: DynamicFormInputProps[];
-  defaultValues?: { [key: string]: string | number };
   schema: any;
-  onSubmit: (data: any, form?: any) => void;
+  defaultValues: any;
+  onSubmit: (data: any, form: UseFormReturn) => void;
 }
 
-function DynamicForm({ inputs, defaultValues, schema, onSubmit }: FormDataProps) {
-  const form = useForm<z.infer<typeof schema>>({
+function DynamicForm<TFormSchema>({
+  inputs,
+  defaultValues,
+  schema,
+  onSubmit,
+}: FormDataProps<TFormSchema>) {
+  const form = useForm({
     resolver: zodResolver(schema),
     defaultValues,
   });
@@ -181,5 +152,3 @@ function DynamicForm({ inputs, defaultValues, schema, onSubmit }: FormDataProps)
 }
 
 export { DynamicForm };
-
-export type { DynamicFormInputProps };

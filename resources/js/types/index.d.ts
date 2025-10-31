@@ -1,3 +1,4 @@
+import { ColumnDef } from '@tanstack/react-table';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -60,3 +61,32 @@ export interface Link {
   page: number;
   url: string;
 }
+
+// ***** START - DYNAMIC FORM INTERFACES *****
+export interface DynamicFormInputProps {
+  name: string;
+  htmlElement: 'input' | 'textarea' | 'select';
+  type: 'text' | 'password' | 'email';
+  label: string;
+  placeholder?: string;
+  options?: { value: string; label: string }[];
+}
+// ***** END - DYNAMIC FORM INTERFACES *****
+
+// ***** START - DATA TABLE INTERFACES *****
+export interface TableData<TData> {
+  columns: ColumnDef<TData>[];
+  data: TData[];
+  links: Link[];
+}
+
+export interface HeaderActions<TFormSchema> {
+  actions: {
+    create: {
+      formInputs: DynamicFormInputProps[];
+      schema: TFormSchema;
+      defaultValues: z.infer<TFormSchema>;
+    };
+  };
+}
+// ***** END - DATA TABLE INTERFACES *****
