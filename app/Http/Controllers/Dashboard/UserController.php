@@ -58,7 +58,7 @@ class UserController extends Controller
             $this->isHRManager() &&
              $validated['role'] != RoleEnum::Recruiter->value
         ) {
-            return back()->with('error', 'You can only create users with role "Recruiter"');
+            return back()->withErrors('You can only create users with role "Recruiter"');
         }
 
         $user = User::create($validated);
@@ -66,7 +66,7 @@ class UserController extends Controller
         $user->roles()->attach($role->id);
         $user->sendEmailVerificationNotification();
 
-        return back()->with('success', 'User created successfully.');
+        return back()->with('message', 'User created successfully.');
     }
 
     /**
@@ -91,7 +91,7 @@ class UserController extends Controller
 
         if (! $user) {
             // throw new Exception('User not found.');
-            return back()->with('error', 'User not found.');
+            return back()->withErrors('User not found.');
         }
 
         return Inertia::render('dashboard/user', [
@@ -121,7 +121,7 @@ class UserController extends Controller
         }
 
         if (! $user) {
-            return back()->with('error', 'User not found.');
+            return back()->withErrors('User not found.');
         }
 
         return Inertia::render('dashboard/user', [
@@ -139,7 +139,8 @@ class UserController extends Controller
             ! $this->userCan(PermissionEnum::UpdateUsers) &&
             ! $this->userCan(PermissionEnum::UpdateOwnUsers)
         ) {
-            return back()->with('error', 'You do not have permission to update this user.');
+            // return response()->json(['message' => 'You do not have permission to update this user.'], 403);
+            return back()->withErrors('You do not have permission to update this user.');
         }
 
         $validated = $request->validated();
@@ -155,7 +156,7 @@ class UserController extends Controller
         }
 
         if (! $user) {
-            return back()->with('error', 'User not found.');
+            return back()->withErrors('User not found.');
         }
 
         if (
@@ -164,7 +165,7 @@ class UserController extends Controller
         ) {
             $emailExists = User::where('email', $validated['email'])->first();
             if ($emailExists) {
-                return back()->with('error', 'Email already exists.');
+                return back()->withErrors('Email already exists.');
             }
             $user->email = $validated['email'];
             $user->save();
@@ -177,7 +178,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return back()->with('success', 'User updated successfully.');
+        return back()->with('message', 'User updated successfully.');
     }
 
     /**
@@ -189,7 +190,12 @@ class UserController extends Controller
             ! $this->userCan(PermissionEnum::DeleteUsers) &&
             ! $this->userCan(PermissionEnum::DeleteOwnUsers)
         ) {
-            return back()->with('error', 'You do not have permission to delete this user.');
+            return back()->withErrors('You do not have permission to delete this user.');
+        }
+
+        if ($this->currentUser()->uuid == $id) {
+            // return response()->json(['message' => 'You cannot delete your own account.'], 400);
+            return back()->withErrors('You cannot delete your own account.');
         }
 
         if ($this->isAdmin()) {
@@ -204,11 +210,11 @@ class UserController extends Controller
         }
 
         if (! $user) {
-            return back()->with('error', 'User not found.');
+            return back()->withErrors('User not found.');
         }
 
         $user->delete();
 
-        return back()->with('success', 'User deleted successfully.');
+        return back()->with('message', 'User deleted successfully.');
     }
 }

@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use App\Enums\User\PermissionEnum;
 use App\Enums\User\RoleEnum;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -13,7 +12,7 @@ trait UserAccessTrait
     /**
      * Get the current authenticated user.
      */
-    protected function currentUser(): ?Authenticatable
+    protected function currentUser()
     {
         return Auth::user();
     }
@@ -27,7 +26,7 @@ trait UserAccessTrait
     }
 
     /**
-     * Get the current user's ID.
+     * Get the current authenticated user's ID.
      */
     protected function userId(): int
     {

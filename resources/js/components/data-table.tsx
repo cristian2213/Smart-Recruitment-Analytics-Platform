@@ -21,8 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { handleHttpErrors } from '@/lib/http';
+import { getUrl } from '@/lib/url';
 import { type HeaderActions, type TableData } from '@/types';
-import { router, usePage } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import {
   flexRender,
   getCoreRowModel,
@@ -47,7 +49,6 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType<any>>({
   headerActions,
 }: DataTableHeaderProps<TData, TFormSchema>) {
   const { actions } = headerActions;
-  const page = usePage();
   const [showCreationForm, setCreationForm] = useState<boolean>(false);
   const [formDefValues, setFormDefValues] = useState<z.infer<TFormSchema>>(
     actions.create.defaultValues,
@@ -74,22 +75,24 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType<any>>({
   const handleNewRecord = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
     setFormDefValues(data);
 
-    router.post(page.url, data, {
+    router.post(getUrl().pathname, data, {
       preserveState: true,
-      onSuccess: () => {
+      onSuccess: (res) => {
         toast.success('New record created', {
-          description: 'The new record has been successfully created.',
+          description:
+            (res?.props?.message as string) || 'new record created successfully.',
         });
         form.reset();
         setCreationForm(false);
         setFormDefValues(actions.create.defaultValues);
       },
       onError: (errors) => {
-        for (const [key, error] of Object.entries(errors)) {
-          form.setError(key as never, {
+        const cb = (key: string, error: string) => {
+          form.setError(key, {
             message: error,
           });
-        }
+        };
+        handleHttpErrors(errors, cb);
       },
     });
   };

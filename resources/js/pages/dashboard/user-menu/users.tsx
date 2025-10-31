@@ -24,27 +24,27 @@ interface UsersProps {
   };
 }
 
+const tableHeaderActions: HeaderActions<typeof formValidation> = {
+  actions: {
+    create: {
+      formInputs,
+      schema: formValidation,
+      defaultValues: {
+        name: '',
+        last_name: '',
+        email: '',
+        password: 'admin123@A',
+        role: 'hr_manager',
+      },
+    },
+  },
+};
+
 export default function Users({ users }: UsersProps) {
   const tableData: TableData<User> = {
     columns,
     data: users.data,
     links: users.links,
-  };
-
-  const tableHeaderActions: HeaderActions<typeof formValidation> = {
-    actions: {
-      create: {
-        formInputs,
-        schema: formValidation,
-        defaultValues: {
-          name: '',
-          last_name: '',
-          email: '',
-          password: '',
-          role: 'hr_manager',
-        },
-      },
-    },
   };
 
   return (
