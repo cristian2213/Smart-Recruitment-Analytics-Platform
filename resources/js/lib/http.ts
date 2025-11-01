@@ -1,3 +1,4 @@
+import { HTTPSuccessRes } from '@/types';
 import { toast } from 'sonner';
 
 export function handleHttpErrors(
@@ -11,4 +12,11 @@ export function handleHttpErrors(
       toast.error(error);
     }
   });
+}
+
+export function handleHttpSuccess(res: HTTPSuccessRes, description?: string) {
+  toast.success(
+    res?.props?.message || 'Operation successfully completed',
+    description ? { description } : undefined,
+  );
 }

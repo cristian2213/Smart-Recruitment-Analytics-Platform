@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { handleHttpErrors } from '@/lib/http';
+import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
 import { getUrl } from '@/lib/url';
 import { type HeaderActions, type TableData } from '@/types';
 import { router } from '@inertiajs/react';
@@ -34,7 +34,6 @@ import {
 } from '@tanstack/react-table';
 import { useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
-import { toast } from 'sonner';
 import * as z from 'zod';
 import { Modal } from './modal';
 
@@ -78,21 +77,17 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType<any>>({
     router.post(getUrl().pathname, data, {
       preserveState: true,
       onSuccess: (res) => {
-        toast.success('New record created', {
-          description:
-            (res?.props?.message as string) || 'new record created successfully.',
-        });
+        handleHttpSuccess(res);
         form.reset();
         setCreationForm(false);
         setFormDefValues(actions.create.defaultValues);
       },
       onError: (errors) => {
-        const cb = (key: string, error: string) => {
+        handleHttpErrors(errors, (key, error) =>
           form.setError(key, {
             message: error,
-          });
-        };
-        handleHttpErrors(errors, cb);
+          }),
+        );
       },
     });
   };
@@ -102,7 +97,7 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType<any>>({
       {/* ****** BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
       <Modal isOpen={showCreationForm} onOpenChange={setCreationForm}>
         <DynamicForm<TFormSchema>
-          inputs={actions.create.formInputs}
+          inputs={actions.create.userFormInputs}
           schema={actions.create.schema}
           defaultValues={formDefValues}
           onSubmit={handleNewRecord}

@@ -24,7 +24,6 @@ function ConfirmationAlert({
   isOpen,
   onOpen,
   onConfirm,
-  onCancel,
 }: ConfirmationAlertProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpen}>
@@ -34,7 +33,7 @@ function ConfirmationAlert({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

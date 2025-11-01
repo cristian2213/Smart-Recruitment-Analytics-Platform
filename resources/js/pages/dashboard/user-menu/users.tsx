@@ -8,7 +8,7 @@ import {
   type User,
 } from '@/types';
 import { Head } from '@inertiajs/react';
-import { columns, formInputs, formValidation } from './form';
+import { columns, createUserValidation, userFormInputs } from './form';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -17,18 +17,11 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-interface UsersProps {
-  users: {
-    data: User[];
-    links: Link[];
-  };
-}
-
-const tableHeaderActions: HeaderActions<typeof formValidation> = {
+const tableHeaderActions: HeaderActions<typeof createUserValidation> = {
   actions: {
     create: {
-      formInputs,
-      schema: formValidation,
+      userFormInputs,
+      schema: createUserValidation,
       defaultValues: {
         name: '',
         last_name: '',
@@ -39,6 +32,13 @@ const tableHeaderActions: HeaderActions<typeof formValidation> = {
     },
   },
 };
+
+interface UsersProps {
+  users: {
+    data: User[];
+    links: Link[];
+  };
+}
 
 export default function Users({ users }: UsersProps) {
   const tableData: TableData<User> = {
@@ -52,7 +52,7 @@ export default function Users({ users }: UsersProps) {
       <Head title="Users" />
       <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
         <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 px-4 py-5 md:min-h-min dark:border-sidebar-border">
-          <DataTable<User, typeof formValidation>
+          <DataTable<User, typeof createUserValidation>
             tableData={tableData}
             headerActions={tableHeaderActions}
           />

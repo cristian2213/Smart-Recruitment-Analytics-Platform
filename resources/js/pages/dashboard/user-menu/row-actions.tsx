@@ -1,4 +1,6 @@
 import { ConfirmationAlert } from '@/components/confirmation-alert';
+import { DynamicForm } from '@/components/dynamic-form';
+import { Modal } from '@/components/modal';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -8,21 +10,51 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { handleHttpErrors } from '@/lib/http';
+import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
 import { addSubPathToUrl, getUrl } from '@/lib/url';
-import { User } from '@/types';
-import { router, usePage } from '@inertiajs/react';
+import { TRole, User } from '@/types';
+import { router } from '@inertiajs/react';
 import { type CellContext } from '@tanstack/react-table';
 import { Ellipsis, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
+import { UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
+import * as z from 'zod';
+import { updateUserValidation, userFormInputs } from './form';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deleteEmptyProps(obj: Record<string, any>) {
+  const newObj = { ...obj };
+  Object.keys(newObj).forEach((key) => {
+    if (newObj[key] === null || newObj[key] === undefined || newObj[key] === '') {
+      delete newObj[key];
+    }
+  });
+  return newObj;
+}
 
 function RowActions(props: CellContext<User, unknown>) {
-  const page = usePage(); // development purpose
+  // const page = usePage(); // development purpose
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
+  const [isCreateFormOpen, setCreateForm] = useState<boolean>(false);
   const { row } = props;
   const id = row.original.uuid;
-  const onOpenConfAlert = () => setIsAlertOpen((preVal) => !preVal);
+
+  // ACTION HANDLES
+
+  const onOpenConfAlert = () => {
+    setIsAlertOpen((preVal) => {
+      const newVal = !preVal;
+      return newVal;
+    });
+  };
+
+  const onEdit = () => setCreateForm(true);
+  const mapEditingData = () => {
+    const roles = row.getValue('roles') as { role: TRole }[];
+    const role = roles[0].role;
+    return { ...row.original, role, password: '' };
+  };
 
   const onCopyID = () => {
     navigator.clipboard.writeText(id).then(() => {
@@ -30,11 +62,13 @@ function RowActions(props: CellContext<User, unknown>) {
     });
   };
 
+  // HTTP METHODS
+
   const onHttpDelete = () => {
     const url = addSubPathToUrl(getUrl(), id);
     router.delete(url, {
       onSuccess: (res) => {
-        toast.success((res?.props?.message as string) || 'Record deleted successfully');
+        handleHttpSuccess(res);
       },
       onError: (errors) => {
         handleHttpErrors(errors);
@@ -42,16 +76,42 @@ function RowActions(props: CellContext<User, unknown>) {
     });
   };
 
-  const onHttpEdit = () => {
+  const onHttpEdit = (
+    data: z.infer<typeof updateUserValidation>,
+    form: UseFormReturn,
+  ) => {
+    const payload = deleteEmptyProps(data);
+    console.log(data, payload);
     const url = addSubPathToUrl(getUrl(), id);
+    router.put(url, payload, {
+      onSuccess: (res) => {
+        handleHttpSuccess(res);
+      },
+      onError: (errors) => {
+        handleHttpErrors(errors, (key, error) =>
+          form.setError(key, {
+            message: error,
+          }),
+        );
+      },
+    });
   };
 
   // development purpose
-  // console.log('Row:', row);
+  // console.log('Row:', row.getValue('roles'));
   // console.log('Page:', page);
 
   return (
     <>
+      <Modal isOpen={isCreateFormOpen} onOpenChange={setCreateForm}>
+        <DynamicForm
+          inputs={userFormInputs}
+          schema={updateUserValidation}
+          defaultValues={mapEditingData()}
+          onSubmit={onHttpEdit}
+        />
+      </Modal>
+
       <ConfirmationAlert
         title="Confirm Deletion"
         description="Are you sure you want to delete this record?"
@@ -70,7 +130,7 @@ function RowActions(props: CellContext<User, unknown>) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
+          <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
           <DropdownMenuItem onClick={onOpenConfAlert}>Delete</DropdownMenuItem>
           <DropdownMenuItem onClick={onCopyID}>Copy ID</DropdownMenuItem>
           <DropdownMenuSeparator />

@@ -21,6 +21,10 @@ class Role extends Model
         'description',
     ];
 
+    protected $hidden = [
+        'pivot',
+    ];
+
     /**
      * Get the users associated with the role.
      */

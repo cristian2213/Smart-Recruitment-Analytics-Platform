@@ -32,8 +32,12 @@ class UserController extends Controller
         }
 
         $users = match ($role) {
-            RoleEnum::Admin->value => User::latest()->paginate(10),
-            RoleEnum::HRManager->value => User::where('created_by', $this->userId())->latest()->paginate(10),
+            RoleEnum::Admin->value => User::with('roles:id,role')
+                ->latest()
+                ->paginate(10),
+            RoleEnum::HRManager->value => User::with('roles:id,role')
+                ->where('created_by', $this->userId())
+                ->latest()->paginate(10),
             default => [],
         };
 
@@ -139,7 +143,6 @@ class UserController extends Controller
             ! $this->userCan(PermissionEnum::UpdateUsers) &&
             ! $this->userCan(PermissionEnum::UpdateOwnUsers)
         ) {
-            // return response()->json(['message' => 'You do not have permission to update this user.'], 403);
             return back()->withErrors('You do not have permission to update this user.');
         }
 
@@ -160,7 +163,7 @@ class UserController extends Controller
         }
 
         if (
-            $validated['email'] &&
+            isset($validated['email']) &&
             $validated['email'] != $user->email
         ) {
             $emailExists = User::where('email', $validated['email'])->first();
@@ -172,7 +175,7 @@ class UserController extends Controller
             $user->sendEmailVerificationNotification();
         }
 
-        if ($validated['password']) {
+        if (isset($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         }
 

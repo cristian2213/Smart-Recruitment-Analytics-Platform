@@ -2,6 +2,11 @@ import { ColumnDef } from '@tanstack/react-table';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HTTPSuccessRes = any;
+
+export type TRole = 'admin' | 'hr_manager' | 'recruiter' | 'applicant';
+
 export interface Auth {
   user: User;
   permissions: Permission[];
@@ -83,7 +88,7 @@ export interface TableData<TData> {
 export interface HeaderActions<TFormSchema> {
   actions: {
     create: {
-      formInputs: DynamicFormInputProps[];
+      userFormInputs: DynamicFormInputProps[];
       schema: TFormSchema;
       defaultValues: z.infer<TFormSchema>;
     };
