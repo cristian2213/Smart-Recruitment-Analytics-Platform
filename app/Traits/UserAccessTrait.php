@@ -90,8 +90,12 @@ trait UserAccessTrait
      */
     protected function forceLogout(User $user): void
     {
-        DB::table('sessions')
-            ->where('user_id', $user->id)
-            ->delete();
+        if ($this->currentUser()->id === $user->id) {
+            Auth::logout();
+        } else {
+            DB::table('sessions')
+                ->where('user_id', $user->id)
+                ->delete();
+        }
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Requests\User\UserRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Traits\UserAccessTrait;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -178,12 +179,12 @@ class UserController extends Controller
             $user->email = $validated['email'];
             $user->email_verified_at = null;
             $user->save();
-            $user->sendEmailVerificationNotification();
+            $user->notify(new VerifyEmail($validated['email']));
         }
 
-        $user->update($validated);
+        // $user->update($validated);
 
-        return back()->with('message', 'User updated successfully.');
+        return back()->with('message', "User updated successfully. {$user->getEmailForVerification()} ");
     }
 
     /**

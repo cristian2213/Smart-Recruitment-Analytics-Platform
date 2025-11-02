@@ -25,7 +25,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
   const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>(
     {
       email: 'admin@test.com',
-      password: 'Admin123@#',
+      password: 'admin123@A',
       remember: false,
     },
   );
