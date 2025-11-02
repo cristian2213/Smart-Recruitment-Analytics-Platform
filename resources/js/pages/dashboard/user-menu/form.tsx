@@ -26,7 +26,7 @@ const columns: ColumnDef<User>[] = [
     header: 'Role',
     cell: ({ row }) => {
       const roles = row.getValue('roles') as { role: TRole }[];
-      const role = roles[0].role;
+      const role = roles.length > 0 ? roles[0].role : 'N/A';
       return (
         <Badge variant="highlight" className="text-xs">
           {role}
@@ -99,7 +99,7 @@ const updateUserValidation = createUserValidation.extend({
     .or(z.literal('')),
 });
 
-const userFormInputs: DynamicFormInputProps[] = [
+const createFormInputs: DynamicFormInputProps[] = [
   {
     name: 'name',
     label: 'First name',
@@ -155,4 +155,12 @@ const userFormInputs: DynamicFormInputProps[] = [
   },
 ];
 
-export { columns, createUserValidation, updateUserValidation, userFormInputs };
+const updateFormInputs = createFormInputs.filter((input) => input.name !== 'role');
+
+export {
+  columns,
+  createFormInputs,
+  createUserValidation,
+  updateFormInputs,
+  updateUserValidation,
+};

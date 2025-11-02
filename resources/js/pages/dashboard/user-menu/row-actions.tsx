@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { updateUserValidation, userFormInputs } from './form';
+import { updateFormInputs, updateUserValidation } from './form';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function deleteEmptyProps(obj: Record<string, any>) {
@@ -52,7 +52,7 @@ function RowActions(props: CellContext<User, unknown>) {
   const onEdit = () => setCreateForm(true);
   const mapEditingData = () => {
     const roles = row.getValue('roles') as { role: TRole }[];
-    const role = roles[0].role;
+    const role = roles.length > 0 ? roles[0].role : '';
     return { ...row.original, role, password: '' };
   };
 
@@ -86,6 +86,7 @@ function RowActions(props: CellContext<User, unknown>) {
     router.put(url, payload, {
       onSuccess: (res) => {
         handleHttpSuccess(res);
+        setCreateForm(false);
       },
       onError: (errors) => {
         handleHttpErrors(errors, (key, error) =>
@@ -105,7 +106,7 @@ function RowActions(props: CellContext<User, unknown>) {
     <>
       <Modal isOpen={isCreateFormOpen} onOpenChange={setCreateForm}>
         <DynamicForm
-          inputs={userFormInputs}
+          inputs={updateFormInputs}
           schema={updateUserValidation}
           defaultValues={mapEditingData()}
           onSubmit={onHttpEdit}

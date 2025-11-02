@@ -19,13 +19,12 @@ class UserRequest extends FormRequest
         $rules = [
             'name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['nullable', 'string', 'max:100'],
-            // 'email' => [
-            //     'nullable', 'string', 'email', 'max:255',
-            // ],
+            'email' => [
+                'nullable', 'string', 'email', 'max:255',
+            ],
             'password' => [
                 'nullable', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
             ],
-            'role' => ['required', 'string', 'exists:roles,role'],
         ];
 
         if ($httpVerb == 'POST') {

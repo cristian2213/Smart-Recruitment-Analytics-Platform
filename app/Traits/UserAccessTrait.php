@@ -4,6 +4,8 @@ namespace App\Traits;
 
 use App\Enums\User\PermissionEnum;
 use App\Enums\User\RoleEnum;
+use App\Models\User;
+use DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -81,5 +83,15 @@ trait UserAccessTrait
     protected function isApplicant(): bool
     {
         return $this->userRole() === RoleEnum::Applicant->value;
+    }
+
+    /**
+     * Force logout a user by deleting their session.
+     */
+    protected function forceLogout(User $user): void
+    {
+        DB::table('sessions')
+            ->where('user_id', $user->id)
+            ->delete();
     }
 }

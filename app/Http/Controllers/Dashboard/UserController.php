@@ -162,6 +162,10 @@ class UserController extends Controller
             return back()->withErrors('User not found.');
         }
 
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        }
+
         if (
             isset($validated['email']) &&
             $validated['email'] != $user->email
@@ -170,13 +174,11 @@ class UserController extends Controller
             if ($emailExists) {
                 return back()->withErrors('Email already exists.');
             }
+            $this->forceLogout($user);
             $user->email = $validated['email'];
+            $user->email_verified_at = null;
             $user->save();
             $user->sendEmailVerificationNotification();
-        }
-
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
         }
 
         $user->update($validated);

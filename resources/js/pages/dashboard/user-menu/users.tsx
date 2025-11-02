@@ -8,7 +8,7 @@ import {
   type User,
 } from '@/types';
 import { Head } from '@inertiajs/react';
-import { columns, createUserValidation, userFormInputs } from './form';
+import { columns, createFormInputs, createUserValidation } from './form';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -20,7 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const tableHeaderActions: HeaderActions<typeof createUserValidation> = {
   actions: {
     create: {
-      userFormInputs,
+      userFormInputs: createFormInputs,
       schema: createUserValidation,
       defaultValues: {
         name: '',
