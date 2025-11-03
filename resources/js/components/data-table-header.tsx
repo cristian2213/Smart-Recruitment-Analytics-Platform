@@ -12,21 +12,53 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from '@/components/ui/menubar';
+import { DEBOUNCE_DELAY } from '@/constans/delays';
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
-import { getUrl } from '@/lib/url';
+import { addQueryToUrl, getUrl } from '@/lib/url';
 import { type HeaderActions, type RequestPayload } from '@/types';
 import { router } from '@inertiajs/react';
 import { Table as ITable } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 import { Modal } from './modal';
+import { Input } from './ui/input';
 
 const creationModal = {
   title: 'Create a new Record',
   description: 'Fill the details for the new record. Click save when you&apos;re done.',
   done: 'Create',
 };
+
+interface SearchEngineProps {
+  onFinish: (query: string) => void;
+}
+
+function SearchEngine({ onFinish }: SearchEngineProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const onSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchQuery(event.target.value);
+
+  useEffect(() => {
+    if (searchQuery.trim() === '') return;
+
+    const timeoutId = setTimeout(() => {
+      onFinish(searchQuery);
+    }, DEBOUNCE_DELAY);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, onFinish]);
+
+  return (
+    <Input
+      type="search"
+      placeholder="Search"
+      value={searchQuery}
+      onChange={onSearch}
+      maxLength={100}
+    />
+  );
+}
 
 interface DataTableHeaderProps<TData, TFormSchema extends z.ZodType> {
   table: ITable<TData>;
@@ -82,8 +114,14 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
     });
   };
 
+  const onHttpSearch = (query: string) => {
+    const url = addQueryToUrl(getUrl(), `search=${query}`);
+
+    console.log('onHttpSearch', 'Executing request...');
+  };
+
   return (
-    <div className="mb-4 flex justify-start">
+    <div className="mb-4 flex justify-between">
       {/* ****** BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
       <Modal
         text={creationModal}
@@ -158,7 +196,9 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           </MenubarMenu>
         </Menubar>
       </div>
-      <div></div>
+      <div>
+        <SearchEngine onFinish={onHttpSearch} />
+      </div>
     </div>
   );
 }
