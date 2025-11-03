@@ -74,7 +74,14 @@ class UserController extends Controller
         $user = User::create($validated);
         $role = Role::where('role', $validated['role'])->first();
         $user->roles()->attach($role->id);
-        $user->sendEmailVerificationNotification();
+        $verification_url = $this->url_generator->generateSignedUrl(
+            'verification.verify',
+            $user->uuid,
+            $user->email
+        );
+        $user->notify(
+            new VerifyEmailNotification($verification_url)
+        );
 
         return back()->with('message', 'User created successfully.');
     }
@@ -84,65 +91,65 @@ class UserController extends Controller
      *
      * @deprecated it wan't implemented
      */
-    public function show(string $id): RedirectResponse|Response
-    {
-        $this->userCanOrFail(PermissionEnum::ViewShowUser);
+    // public function show(string $id): RedirectResponse|Response
+    // {
+    //     $this->userCanOrFail(PermissionEnum::ViewShowUser);
 
-        if ($this->isAdmin()) {
-            $this->userCanOrFail(PermissionEnum::ReadUsers);
-            $user = User::where('uuid', $id)->first();
-        }
+    //     if ($this->isAdmin()) {
+    //         $this->userCanOrFail(PermissionEnum::ReadUsers);
+    //         $user = User::where('uuid', $id)->first();
+    //     }
 
-        if ($this->isHRManager()) {
-            $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
-            $user = User::where([
-                'created_by' => $this->userId(),
-                'uuid' => $id,
-            ])->first();
-        }
+    //     if ($this->isHRManager()) {
+    //         $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
+    //         $user = User::where([
+    //             'created_by' => $this->userId(),
+    //             'uuid' => $id,
+    //         ])->first();
+    //     }
 
-        if (! $user) {
-            // throw new Exception('User not found.');
-            return back()->withErrors('User not found.');
-        }
+    //     if (! $user) {
+    //         // throw new Exception('User not found.');
+    //         return back()->withErrors('User not found.');
+    //     }
 
-        return Inertia::render('dashboard/user', [
-            'user' => $user,
-            'mode' => 'show',
-        ]);
-    }
+    //     return Inertia::render('dashboard/user', [
+    //         'user' => $user,
+    //         'mode' => 'show',
+    //     ]);
+    // }
 
     /**
      * Show the form for editing the specified resource.
      *
      * * @deprecated it wan't implemented
      */
-    public function edit(string $id, UserRequest $request)
-    {
-        $this->userCanOrFail(PermissionEnum::ViewEditUser);
+    // public function edit(string $id, UserRequest $request)
+    // {
+    //     $this->userCanOrFail(PermissionEnum::ViewEditUser);
 
-        if ($this->isAdmin()) {
-            $this->userCanOrFail(PermissionEnum::ReadUsers);
-            $user = User::where('uuid', $id)->first();
-        }
+    //     if ($this->isAdmin()) {
+    //         $this->userCanOrFail(PermissionEnum::ReadUsers);
+    //         $user = User::where('uuid', $id)->first();
+    //     }
 
-        if ($this->isHRManager()) {
-            $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
-            $user = User::where([
-                'created_by' => $this->userId(),
-                'uuid' => $id,
-            ])->first();
-        }
+    //     if ($this->isHRManager()) {
+    //         $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
+    //         $user = User::where([
+    //             'created_by' => $this->userId(),
+    //             'uuid' => $id,
+    //         ])->first();
+    //     }
 
-        if (! $user) {
-            return back()->withErrors('User not found.');
-        }
+    //     if (! $user) {
+    //         return back()->withErrors('User not found.');
+    //     }
 
-        return Inertia::render('dashboard/user', [
-            'user' => $user,
-            'mode' => 'edit',
-        ]);
-    }
+    //     return Inertia::render('dashboard/user', [
+    //         'user' => $user,
+    //         'mode' => 'edit',
+    //     ]);
+    // }
 
     /**
      * Update the specified resource in storage.
@@ -194,8 +201,9 @@ class UserController extends Controller
                 $user->uuid,
                 $validated['email']
             );
-
-            $user->notify(new VerifyEmailNotification($verification_url));
+            $user->notify(
+                new VerifyEmailNotification($verification_url)
+            );
         }
 
         $user->update($validated);
