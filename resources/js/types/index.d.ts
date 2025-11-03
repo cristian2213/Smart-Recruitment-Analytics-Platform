@@ -7,6 +7,13 @@ export type HTTPSuccessRes = any;
 
 export type TRole = 'admin' | 'hr_manager' | 'recruiter' | 'applicant';
 
+export interface InertiaProps {
+  errors: { [key: string]: string };
+  message: string;
+  auth: Auth;
+  sidebarOpen: boolean;
+}
+
 export interface Auth {
   user: User;
   permissions: Permission[];

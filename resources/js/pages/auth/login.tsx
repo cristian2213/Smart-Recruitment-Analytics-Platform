@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { InertiaProps } from '@/types';
 
 type LoginForm = {
   email: string;
@@ -16,12 +17,17 @@ type LoginForm = {
   remember: boolean;
 };
 
-interface LoginProps {
+interface LoginProps extends InertiaProps {
   status?: string;
   canResetPassword: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({
+  status,
+  canResetPassword,
+  errors: propsErrors,
+  message,
+}: LoginProps) {
   const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>(
     {
       email: 'admin@test.com',
@@ -121,6 +127,18 @@ export default function Login({ status, canResetPassword }: LoginProps) {
       {status && (
         <div className="mb-4 text-center text-sm font-medium text-green-600">
           {status}
+        </div>
+      )}
+
+      {message && (
+        <div className="mb-4 text-center text-sm font-medium text-green-600">
+          {message}
+        </div>
+      )}
+
+      {propsErrors?.['verify-email'] && (
+        <div className="mb-4 text-center text-sm font-medium text-red-600">
+          {propsErrors['verify-email']['0']}
         </div>
       )}
     </AuthLayout>

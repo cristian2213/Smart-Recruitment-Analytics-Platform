@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +33,22 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    public function ensureEmailIsVerified(): void
+    {
+        $validated = $this->validated();
+        $user = User::select(['id', 'email_verified_at'])->where('email', $validated['email'])->first();
+
+        if (! $user) {
+            return;
+        }
+
+        if ($user->email_verified_at == null) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.verify-email'),
+            ]);
+        }
+    }
+
     /**
      * Attempt to authenticate the request's credentials.
      *
@@ -40,6 +57,7 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+        $this->ensureEmailIsVerified();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());

@@ -8,8 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UserRequest;
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
+use App\Services\UrlGenerator;
 use App\Traits\UserAccessTrait;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -19,6 +20,10 @@ use Str;
 class UserController extends Controller
 {
     use UserAccessTrait;
+
+    public function __construct(
+        private readonly UrlGenerator $url_generator
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -140,6 +145,7 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, string $id)
     {
+
         if (
             ! $this->userCan(PermissionEnum::UpdateUsers) &&
             ! $this->userCan(PermissionEnum::UpdateOwnUsers)
@@ -175,16 +181,22 @@ class UserController extends Controller
             if ($emailExists) {
                 return back()->withErrors('Email already exists.');
             }
+
             $this->forceLogout($user);
             $user->email = $validated['email'];
             $user->email_verified_at = null;
-            $user->save();
-            $user->notify(new VerifyEmail($validated['email']));
+            $verification_url = $this->url_generator->generateSignedUrl(
+                'verification.verify',
+                $user->uuid,
+                $validated['email']
+            );
+
+            $user->notify(new VerifyEmailNotification($verification_url));
         }
 
-        // $user->update($validated);
+        $user->update($validated);
 
-        return back()->with('message', "User updated successfully. {$user->getEmailForVerification()} ");
+        return back()->with('message', 'User updated successfully.');
     }
 
     /**
