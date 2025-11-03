@@ -11,12 +11,20 @@ import {
 import React from 'react';
 
 interface ModalProps {
+  text: {
+    title: string;
+    description: string;
+    done: string;
+    cancel?: string;
+  };
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  isEdit?: boolean;
   formLink?: string; // to link the submit btn to react-hook-form
+  onOpenChange: (open: boolean) => void;
 }
 
 function Modal({
+  text: { title, description, done, cancel = 'Cancel' },
   children,
   formLink = 'dynamic-form',
   isOpen,
@@ -26,20 +34,18 @@ function Modal({
     <Dialog open={isOpen} onOpenChange={onOpenChange} modal={true}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create a new Record</DialogTitle>
-          <DialogDescription>
-            Fill the details for the new record. Click save when you&apos;re done.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         {children}
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">{cancel}</Button>
           </DialogClose>
           <Button type="submit" form={formLink}>
-            Create
+            {done}
           </Button>
         </DialogFooter>
       </DialogContent>

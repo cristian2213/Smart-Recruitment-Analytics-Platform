@@ -14,9 +14,9 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
         return Inertia::render('dashboard/dashboard');
     })->name('dashboard');
 
-    Route::resource('users', UserController::class)->names('dashboard.users');
+    Route::resource('users', UserController::class)->names('dashboard.users')->except(['show', 'edit']);
 
-    Route::resource('jobs', JobController::class)->names('dashboard.jobs');
+    Route::resource('jobs', JobController::class)->names('dashboard.jobs')->except(['show', 'edit']);
 });
 
 // Route::middleware('auth')->group(function () {

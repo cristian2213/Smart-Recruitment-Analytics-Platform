@@ -37,6 +37,12 @@ import { type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 import { Modal } from './modal';
 
+const creationModal = {
+  title: 'Create a new Record',
+  description: 'Fill the details for the new record. Click save when you&apos;re done.',
+  done: 'Create',
+};
+
 interface DataTableHeaderProps<TData, TFormSchema> {
   table: ITable<TData>;
   headerActions: HeaderActions<TFormSchema>;
@@ -95,7 +101,11 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType<any>>({
   return (
     <div className="mb-4 flex justify-start">
       {/* ****** BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
-      <Modal isOpen={showCreationForm} onOpenChange={setCreationForm}>
+      <Modal
+        text={creationModal}
+        isOpen={showCreationForm}
+        onOpenChange={setCreationForm}
+      >
         <DynamicForm<TFormSchema>
           inputs={actions.create.userFormInputs}
           schema={actions.create.schema}

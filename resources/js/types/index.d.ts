@@ -45,6 +45,12 @@ export interface SharedData {
   [key: string]: unknown;
 }
 
+export interface Role {
+  id: string;
+  role: string;
+  description: string | null;
+}
+
 export interface User {
   id: number;
   uuid: string;
@@ -52,6 +58,8 @@ export interface User {
   email: string;
   avatar?: string;
   email_verified_at: string | null;
+  roles: Role[];
+  role: string;
   [key: string]: unknown; // This allows for additional properties...
 }
 

@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
 import { addSubPathToUrl, getUrl } from '@/lib/url';
-import { TRole, User } from '@/types';
+import { deleteEmptyProps } from '@/lib/utils';
+import { User } from '@/types';
 import { router } from '@inertiajs/react';
 import { type CellContext } from '@tanstack/react-table';
 import { Ellipsis, MoreHorizontal } from 'lucide-react';
@@ -22,16 +23,11 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import { updateFormInputs, updateUserValidation } from './form';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function deleteEmptyProps(obj: Record<string, any>) {
-  const newObj = { ...obj };
-  Object.keys(newObj).forEach((key) => {
-    if (newObj[key] === null || newObj[key] === undefined || newObj[key] === '') {
-      delete newObj[key];
-    }
-  });
-  return newObj;
-}
+const editionModal = {
+  title: 'Edit a Record',
+  description: 'Modify the inputs as you wish. Click Edit when you&apos;re done.',
+  done: 'Edit',
+};
 
 function RowActions(props: CellContext<User, unknown>) {
   // const page = usePage(); // development purpose
@@ -50,11 +46,6 @@ function RowActions(props: CellContext<User, unknown>) {
   };
 
   const onEdit = () => setCreateForm(true);
-  const mapEditingData = () => {
-    const roles = row.getValue('roles') as { role: TRole }[];
-    const role = roles.length > 0 ? roles[0].role : '';
-    return { ...row.original, role, password: '' };
-  };
 
   const onCopyID = () => {
     navigator.clipboard.writeText(id).then(() => {
@@ -81,7 +72,6 @@ function RowActions(props: CellContext<User, unknown>) {
     form: UseFormReturn,
   ) => {
     const payload = deleteEmptyProps(data);
-    console.log(data, payload);
     const url = addSubPathToUrl(getUrl(), id);
     router.put(url, payload, {
       onSuccess: (res) => {
@@ -104,11 +94,16 @@ function RowActions(props: CellContext<User, unknown>) {
 
   return (
     <>
-      <Modal isOpen={isCreateFormOpen} onOpenChange={setCreateForm}>
+      <Modal
+        text={editionModal}
+        isOpen={isCreateFormOpen}
+        isEdit={true}
+        onOpenChange={setCreateForm}
+      >
         <DynamicForm
           inputs={updateFormInputs}
           schema={updateUserValidation}
-          defaultValues={mapEditingData()}
+          defaultValues={row.original}
           onSubmit={onHttpEdit}
         />
       </Modal>

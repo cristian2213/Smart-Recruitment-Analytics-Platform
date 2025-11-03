@@ -43,7 +43,14 @@ interface UsersProps {
 export default function Users({ users }: UsersProps) {
   const tableData: TableData<User> = {
     columns,
-    data: users.data,
+    data: users.data.map((user) => {
+      const role = user.roles[0]?.role;
+      return {
+        ...user,
+        role,
+        password: '',
+      };
+    }),
     links: users.links,
   };
 

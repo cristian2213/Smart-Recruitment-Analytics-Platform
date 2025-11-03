@@ -81,6 +81,8 @@ class UserController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @deprecated it wan't implemented
      */
     public function show(string $id): RedirectResponse|Response
     {
@@ -112,6 +114,8 @@ class UserController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     *
+     * * @deprecated it wan't implemented
      */
     public function edit(string $id, UserRequest $request)
     {
