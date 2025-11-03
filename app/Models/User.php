@@ -58,6 +58,13 @@ class User extends Authenticatable
         ];
     }
 
+    public function getEmailVerifiedAtAttribute(): ?string
+    {
+        $value = $this->attributes['email_verified_at'] ?? null;
+
+        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d') : null;
+    }
+
     /**
      * Get the route key for the model.
      */

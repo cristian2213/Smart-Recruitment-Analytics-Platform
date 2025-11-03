@@ -15,7 +15,7 @@ const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'last_name',
-    header: 'Last Name',
+    header: 'Last name',
   },
   {
     accessorKey: 'email',
@@ -35,8 +35,23 @@ const columns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: 'email_verified_at',
+    header: 'Verified at',
+    cell: ({ row }) => {
+      const verifiedAt = row.getValue('email_verified_at') as string | null;
+      return (
+        <Badge
+          variant={verifiedAt == null ? 'destructive' : 'outline'}
+          className="text-xs"
+        >
+          {verifiedAt == null ? 'unconfirmed' : verifiedAt}
+        </Badge>
+      );
+    },
+  },
+  {
     accessorKey: 'updated_at',
-    header: 'Updated At',
+    header: 'Updated at',
     cell: ({ row }) => {
       const date = row.getValue('updated_at') as string;
       const formattedDate = date ? new Date(date).toLocaleString() : 'N/A';

@@ -1,11 +1,34 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
+import * as z from 'zod';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type HTTPSuccessRes = any;
+export type HTTPSuccessRes = {
+  props: {
+    message?: string;
+    errors: Array<string, unknown>;
+  };
+};
 
 export type TRole = 'admin' | 'hr_manager' | 'recruiter' | 'applicant';
+
+// ***** START - INERTIA REQUEST PAYLOAD *****
+type FormDataConvertibleValue =
+  | Blob
+  | FormDataEntryValue
+  | Date
+  | boolean
+  | number
+  | null
+  | undefined;
+type FormDataConvertible =
+  | Array<FormDataConvertible>
+  | {
+      [key: string]: FormDataConvertible;
+    }
+  | FormDataConvertibleValue;
+export type RequestPayload = Record<string, FormDataConvertible> | FormData;
+// ********************************************
 
 export interface InertiaProps {
   errors: { [key: string]: string };
@@ -91,7 +114,7 @@ export interface DynamicFormInputProps {
   placeholder?: string;
   options?: { value: string; label: string }[];
 }
-// ***** END - DYNAMIC FORM INTERFACES *****
+// ********************************************
 
 // ***** START - DATA TABLE INTERFACES *****
 export interface TableData<TData> {
@@ -100,7 +123,7 @@ export interface TableData<TData> {
   links: Link[];
 }
 
-export interface HeaderActions<TFormSchema> {
+export interface HeaderActions<TFormSchema extends z.ZodTypeAny> {
   actions: {
     create: {
       userFormInputs: DynamicFormInputProps[];
@@ -109,4 +132,4 @@ export interface HeaderActions<TFormSchema> {
     };
   };
 }
-// ***** END - DATA TABLE INTERFACES *****
+// ********************************************
