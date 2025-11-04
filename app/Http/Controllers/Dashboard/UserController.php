@@ -12,6 +12,7 @@ use App\Notifications\VerifyEmailNotification;
 use App\Services\UrlGenerator;
 use App\Traits\UserAccessTrait;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -28,8 +29,11 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search_query = $request->query('search');
+        info('$search_query', ['search' => $search_query]);
+
         $this->userCanOrFail(PermissionEnum::ViewUsers);
         $role = $this->userRole();
 
@@ -43,7 +47,8 @@ class UserController extends Controller
                 ->paginate(10),
             RoleEnum::HRManager->value => User::with('roles:id,role')
                 ->where('created_by', $this->userId())
-                ->latest()->paginate(10),
+                ->latest()
+                ->paginate(10),
             default => [],
         };
 

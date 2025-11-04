@@ -13,7 +13,7 @@ import {
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
 import { addSubPathToUrl, getUrl } from '@/lib/url';
 import { deleteEmptyProps } from '@/lib/utils';
-import { User } from '@/types';
+import { RequestPayload, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { type CellContext } from '@tanstack/react-table';
 import { Ellipsis, MoreHorizontal } from 'lucide-react';
@@ -73,7 +73,7 @@ function RowActions(props: CellContext<User, unknown>) {
   ) => {
     const payload = deleteEmptyProps(data);
     const url = addSubPathToUrl(getUrl(), id);
-    router.put(url, payload, {
+    router.put(url, payload as RequestPayload, {
       onSuccess: (res) => {
         handleHttpSuccess(res);
         setCreateForm(false);

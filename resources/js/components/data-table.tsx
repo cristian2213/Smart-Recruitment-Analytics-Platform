@@ -7,12 +7,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { flexRender, Table as ITable } from '@tanstack/react-table';
+import { useEffect } from 'react';
 
 interface DataTableProps<TData> {
   table: ITable<TData>;
 }
 
 function DataTable<TData>({ table }: DataTableProps<TData>) {
+  useEffect(() => {
+    console.log('DataTable - Rendering...');
+
+    return () => console.log('DataTable - Deleting...');
+  }, []);
   return (
     <>
       <Table>

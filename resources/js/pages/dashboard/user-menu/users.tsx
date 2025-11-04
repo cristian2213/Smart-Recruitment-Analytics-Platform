@@ -1,5 +1,5 @@
 import { DataTable } from '@/components/data-table';
-import { DataTableHeader } from '@/components/data-table-header';
+import { DataTableHeader, SearchEngine } from '@/components/data-table-header';
 import { DataTablePagination } from '@/components/data-table-pagination';
 import AppLayout from '@/layouts/app-layout';
 import {
@@ -11,7 +11,7 @@ import {
 } from '@/types';
 import { Head } from '@inertiajs/react';
 import { VisibilityState, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { columns, createFormInputs, createUserValidation } from './form';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -45,18 +45,21 @@ interface UsersProps {
 }
 
 export default function Users({ users }: UsersProps) {
-  const tableData: TableData<User> = {
-    columns,
-    data: users.data.map((user) => {
-      const role = user.roles[0]?.role;
-      return {
-        ...user,
-        role,
-        password: '',
-      };
+  const tableData: TableData<User> = useMemo(
+    () => ({
+      columns,
+      data: users.data.map((user) => {
+        const role = user.roles[0]?.role;
+        return {
+          ...user,
+          role,
+          password: '',
+        };
+      }),
+      links: users.links,
     }),
-    links: users.links,
-  };
+    [users.data, users.links],
+  );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const table = useReactTable({
@@ -75,6 +78,7 @@ export default function Users({ users }: UsersProps) {
       <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
         <div className="relative min-h-screen flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 px-4 py-5 md:min-h-min dark:border-sidebar-border">
           <div className="flex flex-col overflow-hidden rounded-md">
+            <SearchEngine />
             <DataTableHeader<User, typeof createUserValidation>
               table={table}
               headerActions={tableHeaderActions}

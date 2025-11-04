@@ -12,16 +12,16 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from '@/components/ui/menubar';
-import { DEBOUNCE_DELAY } from '@/constans/delays';
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
-import { addQueryToUrl, getUrl } from '@/lib/url';
+import { getUrl } from '@/lib/url';
 import { type HeaderActions, type RequestPayload } from '@/types';
-import { router } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Table as ITable } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 import { Modal } from './modal';
+import { Button } from './ui/button';
 import { Input } from './ui/input';
 
 const creationModal = {
@@ -30,33 +30,40 @@ const creationModal = {
   done: 'Create',
 };
 
-interface SearchEngineProps {
-  onFinish: (query: string) => void;
-}
+// interface SearchEngineProps {
+//   // searchQuery: string;
+//   // setSearchQuery: (event: React.ChangeEvent<HTMLInputElement>) => void;
+//   // onFinish: (query: string) => void;
+// }
 
-function SearchEngine({ onFinish }: SearchEngineProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const onSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchQuery(event.target.value);
+export function SearchEngine() {
+  const { data, setData, get, processing, errors } = useForm({
+    query: '',
+  });
 
-  useEffect(() => {
-    if (searchQuery.trim() === '') return;
+  const submit = (e: any) => {
+    e.preventDefault();
+    // const url = addQueryToUrl(getUrl(), `search=${data.query}`);
 
-    const timeoutId = setTimeout(() => {
-      onFinish(searchQuery);
-    }, DEBOUNCE_DELAY);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, onFinish]);
+    get(getUrl().pathname, {
+      preserveState: true,
+    });
+  };
 
   return (
-    <Input
-      type="search"
-      placeholder="Search"
-      value={searchQuery}
-      onChange={onSearch}
-      maxLength={100}
-    />
+    <form onSubmit={submit} className="flex gap-2">
+      <Input
+        type="search"
+        value={data.query}
+        onChange={(e) => setData('query', e.target.value)}
+        placeholder="Search"
+        maxLength={100}
+      />
+
+      <Button type="submit" disabled={processing}>
+        {processing ? 'Searching...' : 'Search'}
+      </Button>
+    </form>
   );
 }
 
@@ -74,6 +81,7 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
   const [formDefValues, setFormDefValues] = useState<z.infer<TFormSchema>>(
     actions.create.defaultValues as z.infer<TFormSchema>,
   );
+  // const [searchQuery, setSearchQuery] = useState('');
 
   const getVisibleColumns = () => {
     return table
@@ -92,6 +100,9 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
         );
       });
   };
+
+  // const onSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
+  //   setSearchQuery(event.target.value);
 
   const onHttpCreate = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
     setFormDefValues(data);
@@ -114,11 +125,27 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
     });
   };
 
-  const onHttpSearch = (query: string) => {
-    const url = addQueryToUrl(getUrl(), `search=${query}`);
+  // const onHttpSearch = (query: any) => {
+  //   // const url = addQueryToUrl(getUrl(), `search=${query}`);
+  //   // console.log('url', url);
 
-    console.log('onHttpSearch', 'Executing request...');
-  };
+  //   router.get(
+  //     '/dashboard/users',
+  //     { search: searchQuery },
+  //     {
+  //       // preserveState: true,
+  //       replace: true,
+  //       preserveUrl: true,
+
+  //       // onSuccess: (res) => {
+  //       //   handleHttpSuccess(res);
+  //       // },
+  //       // onError: (errors) => {
+  //       //   handleHttpErrors(errors);
+  //       // },
+  //     },
+  //   );
+  // };
 
   return (
     <div className="mb-4 flex justify-between">
@@ -196,9 +223,7 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           </MenubarMenu>
         </Menubar>
       </div>
-      <div>
-        <SearchEngine onFinish={onHttpSearch} />
-      </div>
+      <div>{/* <SearchEngine /> */}</div>
     </div>
   );
 }
