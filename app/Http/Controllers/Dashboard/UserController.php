@@ -31,8 +31,7 @@ class UserController extends Controller
      */
     public function index(Request $request): Response
     {
-        $search_query = $request->query('search');
-        info('$search_query', ['search' => $search_query]);
+        $searchQuery = $request->query('query');
 
         $this->userCanOrFail(PermissionEnum::ViewUsers);
         $role = $this->userRole();
@@ -41,14 +40,33 @@ class UserController extends Controller
             $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
         }
 
+        $searchCb = function ($query) use ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('uuid', 'like', "%{$searchQuery}%")
+                    ->orWhere('name', 'like', "%{$searchQuery}%")
+                    ->orWhere('last_name', 'like', "%{$searchQuery}%")
+                    ->orWhere('email', 'like', "%{$searchQuery}%")
+                    ->orWhereHas('creator', function ($subQ) use ($searchQuery) {
+                        $subQ->where('name', 'like', "%{$searchQuery}%");
+                    })
+                    ->orWhere('email_verified_at', 'like', "%{$searchQuery}%")
+                    ->orWhere('created_at', 'like', "%{$searchQuery}%")
+                    ->orWhere('updated_at', 'like', "%{$searchQuery}%");
+            });
+        };
+
         $users = match ($role) {
             RoleEnum::Admin->value => User::with('roles:id,role')
+                ->when($searchQuery, $searchCb)
                 ->latest()
-                ->paginate(10),
+                ->paginate(20)
+                ->withQueryString(),
             RoleEnum::HRManager->value => User::with('roles:id,role')
                 ->where('created_by', $this->userId())
+                ->when($searchQuery, $searchCb)
                 ->latest()
-                ->paginate(10),
+                ->paginate(20)
+                ->withQueryString(),
             default => [],
         };
 

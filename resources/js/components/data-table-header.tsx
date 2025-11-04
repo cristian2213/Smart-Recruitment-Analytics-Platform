@@ -30,23 +30,19 @@ const creationModal = {
   done: 'Create',
 };
 
-// interface SearchEngineProps {
-//   // searchQuery: string;
-//   // setSearchQuery: (event: React.ChangeEvent<HTMLInputElement>) => void;
-//   // onFinish: (query: string) => void;
-// }
-
 export function SearchEngine() {
-  const { data, setData, get, processing, errors } = useForm({
+  const { data, setData, get, processing } = useForm({
     query: '',
   });
 
-  const submit = (e: any) => {
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const url = addQueryToUrl(getUrl(), `search=${data.query}`);
+    const query = data.query.trim();
+    if (query === '') return;
 
-    get(getUrl().pathname, {
+    get('', {
       preserveState: true,
+      replace: true,
     });
   };
 
@@ -81,7 +77,6 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
   const [formDefValues, setFormDefValues] = useState<z.infer<TFormSchema>>(
     actions.create.defaultValues as z.infer<TFormSchema>,
   );
-  // const [searchQuery, setSearchQuery] = useState('');
 
   const getVisibleColumns = () => {
     return table
@@ -100,9 +95,6 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
         );
       });
   };
-
-  // const onSearch = (event: React.ChangeEvent<HTMLInputElement>) =>
-  //   setSearchQuery(event.target.value);
 
   const onHttpCreate = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
     setFormDefValues(data);
@@ -124,28 +116,6 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
       },
     });
   };
-
-  // const onHttpSearch = (query: any) => {
-  //   // const url = addQueryToUrl(getUrl(), `search=${query}`);
-  //   // console.log('url', url);
-
-  //   router.get(
-  //     '/dashboard/users',
-  //     { search: searchQuery },
-  //     {
-  //       // preserveState: true,
-  //       replace: true,
-  //       preserveUrl: true,
-
-  //       // onSuccess: (res) => {
-  //       //   handleHttpSuccess(res);
-  //       // },
-  //       // onError: (errors) => {
-  //       //   handleHttpErrors(errors);
-  //       // },
-  //     },
-  //   );
-  // };
 
   return (
     <div className="mb-4 flex justify-between">
@@ -223,7 +193,9 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           </MenubarMenu>
         </Menubar>
       </div>
-      <div>{/* <SearchEngine /> */}</div>
+      <div>
+        <SearchEngine />
+      </div>
     </div>
   );
 }
