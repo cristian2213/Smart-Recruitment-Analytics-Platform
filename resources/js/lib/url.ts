@@ -38,3 +38,8 @@ export function encodeUrl(input: URL | string, absolute = false): string {
 
   return absolute ? `${url.origin}${encodedPath}${search}` : `${encodedPath}${search}`;
 }
+
+export function getQueryParam(param: string) {
+  const url = new URL(window.location.href);
+  return url.searchParams.get(param) ?? '';
+}

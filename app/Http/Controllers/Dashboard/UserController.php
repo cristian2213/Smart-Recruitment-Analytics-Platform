@@ -59,13 +59,13 @@ class UserController extends Controller
             RoleEnum::Admin->value => User::with('roles:id,role')
                 ->when($searchQuery, $searchCb)
                 ->latest()
-                ->paginate(20)
+                ->paginate(10)
                 ->withQueryString(),
             RoleEnum::HRManager->value => User::with('roles:id,role')
                 ->where('created_by', $this->userId())
                 ->when($searchQuery, $searchCb)
                 ->latest()
-                ->paginate(20)
+                ->paginate(10)
                 ->withQueryString(),
             default => [],
         };

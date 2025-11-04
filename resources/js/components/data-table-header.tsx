@@ -12,12 +12,13 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from '@/components/ui/menubar';
+import { DEBOUNCE_DELAY } from '@/constans/delays';
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
-import { getUrl } from '@/lib/url';
+import { getQueryParam, getUrl } from '@/lib/url';
 import { type HeaderActions, type RequestPayload } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import { Table as ITable } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 import { Modal } from './modal';
@@ -32,32 +33,37 @@ const creationModal = {
 
 export function SearchEngine() {
   const { data, setData, get, processing } = useForm({
-    query: '',
+    query: getQueryParam('query'),
   });
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const query = data.query.trim();
-    if (query === '') return;
+  useEffect(() => {
+    const timerKey = setTimeout(() => {
+      get('', {
+        preserveState: true,
+        replace: true, // doesn't track the browser history
+      });
+    }, DEBOUNCE_DELAY);
 
-    get('', {
-      preserveState: true,
-      replace: true,
-    });
+    return () => clearTimeout(timerKey);
+  }, [data.query, get]);
+
+  const onHttpFilterReset = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setData('query', '');
   };
 
   return (
-    <form onSubmit={submit} className="flex gap-2">
+    <form onSubmit={onHttpFilterReset} className="flex gap-2">
       <Input
         type="search"
         value={data.query}
-        onChange={(e) => setData('query', e.target.value)}
+        onChange={(e) => setData('query', e.target.value.trim())}
         placeholder="Search"
         maxLength={100}
       />
 
-      <Button type="submit" disabled={processing}>
-        {processing ? 'Searching...' : 'Search'}
+      <Button type="submit" disabled={processing} variant="secondary">
+        Reset
       </Button>
     </form>
   );
