@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestampsTz();
             $table->softDeletes();
         });
 
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->json('education')->nullable();
             $table->string('phone_number', 50)->nullable();
             $table->json('skills')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
             $table->foreignId('user_id')->constrained('users')->noActionOnDelete();
         });
 
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->string('extension');
             $table->string('mime_type');
             $table->string('size');
-            $table->timestamps();
+            $table->timestampsTz();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

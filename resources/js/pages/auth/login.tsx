@@ -31,7 +31,7 @@ export default function Login({
   const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>(
     {
       email: 'admin@test.com',
-      password: 'admin123@A',
+      password: 'Admin123@#',
       remember: false,
     },
   );

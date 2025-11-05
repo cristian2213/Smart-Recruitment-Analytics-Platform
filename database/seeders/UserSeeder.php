@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             ->create(['created_by' => $hrManager->id]);
 
         User::factory()
-            ->count(1)
+            ->count(30)
             ->applicantRole()
             ->create(['created_by' => $recruiter->id]);
     }

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use App\Services\UrlGenerator;
 use App\Traits\UserAccessTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -40,31 +41,33 @@ class UserController extends Controller
             $this->userCanOrFail(PermissionEnum::ReadOwnUsers);
         }
 
-        $searchCb = function ($query) use ($searchQuery) {
+        $searchCb = function (Builder $query) use ($searchQuery) {
             $query->where(function ($q) use ($searchQuery) {
                 $q->where('uuid', 'like', "%{$searchQuery}%")
                     ->orWhere('name', 'like', "%{$searchQuery}%")
                     ->orWhere('last_name', 'like', "%{$searchQuery}%")
                     ->orWhere('email', 'like', "%{$searchQuery}%")
-                    ->orWhereHas('creator', function ($subQ) use ($searchQuery) {
-                        $subQ->where('name', 'like', "%{$searchQuery}%");
+                    // ->orWhereHas('creator', function ($subQ) use ($searchQuery) {
+                    //     $subQ->where('name', 'like', "%{$searchQuery}%");
+                    // })
+                    ->orWhereHas('roles', function ($subQ) use ($searchQuery) {
+                        $subQ->where('role', 'like', "%{$searchQuery}%");
                     })
-                    ->orWhere('email_verified_at', 'like', "%{$searchQuery}%")
-                    ->orWhere('created_at', 'like', "%{$searchQuery}%")
-                    ->orWhere('updated_at', 'like', "%{$searchQuery}%");
+                    ->orWhere('created_at', 'like', "%{$searchQuery}%");
             });
         };
 
         $users = match ($role) {
             RoleEnum::Admin->value => User::with('roles:id,role')
+                ->select('id', 'uuid', 'name', 'last_name', 'email', 'email_verified_at', 'updated_at')
                 ->when($searchQuery, $searchCb)
-                ->latest()
+                ->latest('id')
                 ->paginate(10)
                 ->withQueryString(),
             RoleEnum::HRManager->value => User::with('roles:id,role')
                 ->where('created_by', $this->userId())
                 ->when($searchQuery, $searchCb)
-                ->latest()
+                ->latest('id')
                 ->paginate(10)
                 ->withQueryString(),
             default => [],

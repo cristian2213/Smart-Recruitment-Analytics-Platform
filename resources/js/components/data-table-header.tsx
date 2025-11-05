@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/menubar';
 import { DEBOUNCE_DELAY } from '@/constans/delays';
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
+import { toIsoWithOffset } from '@/lib/time';
 import { getQueryParam, getUrl } from '@/lib/url';
 import { type HeaderActions, type RequestPayload } from '@/types';
 import { router, useForm } from '@inertiajs/react';
@@ -32,7 +33,7 @@ const creationModal = {
 };
 
 export function SearchEngine() {
-  const { data, setData, get, processing } = useForm({
+  const { data, setData, get, processing } = useForm<{ query: string; page?: string }>({
     query: getQueryParam('query'),
   });
 
@@ -47,9 +48,16 @@ export function SearchEngine() {
     return () => clearTimeout(timerKey);
   }, [data.query, get]);
 
+  const onSetQuery = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setData('query', event.target.value.trim());
+    setData('page', '1');
+  };
+
   const onHttpFilterReset = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (data.query === '') return;
     setData('query', '');
+    setData('page', '1');
   };
 
   return (
@@ -57,9 +65,10 @@ export function SearchEngine() {
       <Input
         type="search"
         value={data.query}
-        onChange={(e) => setData('query', e.target.value.trim())}
+        onChange={onSetQuery}
         placeholder="Search"
         maxLength={100}
+        className="w-70"
       />
 
       <Button type="submit" disabled={processing} variant="secondary">
@@ -103,9 +112,13 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
   };
 
   const onHttpCreate = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
-    setFormDefValues(data);
+    const createdAt = toIsoWithOffset(new Date());
 
-    router.post(getUrl().pathname, data as RequestPayload, {
+    const payload = { ...(data as Record<string, unknown>), created_at: createdAt };
+
+    setFormDefValues(payload as z.infer<TFormSchema>);
+
+    router.post(getUrl().pathname, payload as RequestPayload, {
       preserveState: true,
       onSuccess: (res) => {
         handleHttpSuccess(res);

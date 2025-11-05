@@ -37,7 +37,7 @@ class UserRequest extends FormRequest
                 'password' => [
                     'required', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
                 ],
-                'created_at' => ['nullable', 'timezone:all'],
+                'created_at' => ['required', 'date_format:Y-m-d\TH:i:sP'],
                 'role' => ['required', 'string', 'exists:roles,role'],
             ];
         }
