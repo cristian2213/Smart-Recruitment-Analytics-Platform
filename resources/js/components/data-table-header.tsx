@@ -136,6 +136,10 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
     });
   };
 
+  const onHttpDownload = () => {
+    window.location.href = route('users.download');
+  };
+
   return (
     <div className="mb-4 flex justify-between">
       {/* ****** BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
@@ -189,7 +193,7 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           <MenubarMenu>
             <MenubarTrigger>Archivable</MenubarTrigger>
             <MenubarContent>
-              <MenubarItem>
+              <MenubarItem onClick={onHttpDownload}>
                 Export Data <MenubarShortcut>⌘T</MenubarShortcut>
               </MenubarItem>
               <MenubarSub>

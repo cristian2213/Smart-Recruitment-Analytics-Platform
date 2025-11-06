@@ -250,7 +250,6 @@ class UserController extends Controller
         }
 
         if ($this->currentUser()->uuid == $id) {
-            // return response()->json(['message' => 'You cannot delete your own account.'], 400);
             return back()->withErrors('You cannot delete your own account.');
         }
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Dashboard\JobController;
 use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\UserDownloadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,8 +16,9 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     })->name('dashboard');
 
     Route::resource('users', UserController::class)->names('dashboard.users')->except(['show', 'edit']);
-
     Route::resource('jobs', JobController::class)->names('dashboard.jobs')->except(['show', 'edit']);
+
+    Route::get('users/download', [UserDownloadController::class, 'download_users'])->name('users.download');
 });
 
 // Route::middleware('auth')->group(function () {
