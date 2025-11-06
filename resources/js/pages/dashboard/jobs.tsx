@@ -1,21 +1,21 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Job } from '@/types';
-import { Head } from '@inertiajs/react';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern'
+import AppLayout from '@/layouts/app-layout'
+import { type BreadcrumbItem, type Job } from '@/types'
+import { Head } from '@inertiajs/react'
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Jobs',
     href: '/dashboard/jobs',
   },
-];
+]
 
 interface JobsProps {
-  jobs: Job[];
+  jobs: Job[]
 }
 
 export default function Jobs(props: JobsProps) {
-  console.log(props?.jobs);
+  console.log(props?.jobs)
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Jobs" />
@@ -36,5 +36,5 @@ export default function Jobs(props: JobsProps) {
         </div>
       </div>
     </AppLayout>
-  );
+  )
 }

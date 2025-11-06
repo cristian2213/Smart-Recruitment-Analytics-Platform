@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -7,20 +7,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import React from 'react';
+} from '@/components/ui/dialog'
+import React from 'react'
 
 interface ModalProps {
   text: {
-    title: string;
-    description: string;
-    done: string;
-    cancel?: string;
-  };
-  isOpen: boolean;
-  isEdit?: boolean;
-  formLink?: string; // to link the submit btn to react-hook-form
-  onOpenChange: (open: boolean) => void;
+    title: string
+    description: string
+    done: string
+    cancel?: string
+  }
+  isOpen: boolean
+  isEdit?: boolean
+  formLink?: string // to link the submit btn to react-hook-form
+  onOpenChange: (open: boolean) => void
 }
 
 function Modal({
@@ -50,9 +50,9 @@ function Modal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
-const MemoizedModal = React.memo(Modal);
+const MemoizedModal = React.memo(Modal)
 
-export { MemoizedModal as Modal };
+export { MemoizedModal as Modal }

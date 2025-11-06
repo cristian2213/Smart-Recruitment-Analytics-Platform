@@ -6,22 +6,22 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@/components/ui/pagination';
-import { type Link } from '@/types';
-import { useForm } from '@inertiajs/react';
+} from '@/components/ui/pagination'
+import { type Link } from '@/types'
+import { useForm } from '@inertiajs/react'
 
 interface DataTablePaginationProps {
-  links: Link[];
+  links: Link[]
 }
 
 function DataTablePagination({ links }: DataTablePaginationProps) {
-  const { get } = useForm();
+  const { get } = useForm()
 
-  const handlePageChange = (link: Link) => link?.url && get(link.url);
+  const handlePageChange = (link: Link) => link?.url && get(link.url)
 
   const renderLinks = () => {
-    const copyLinks = [...links];
-    const prevLink = copyLinks.shift() as Link;
+    const copyLinks = [...links]
+    const prevLink = copyLinks.shift() as Link
     const prevLinkNode = (
       <PaginationItem key="prev">
         <PaginationPrevious
@@ -29,8 +29,8 @@ function DataTablePagination({ links }: DataTablePaginationProps) {
           onClick={() => handlePageChange(prevLink)}
         />
       </PaginationItem>
-    );
-    const nextLink = copyLinks.pop() as Link;
+    )
+    const nextLink = copyLinks.pop() as Link
     const nextLinkNode = (
       <PaginationItem key="next">
         <PaginationNext
@@ -38,19 +38,19 @@ function DataTablePagination({ links }: DataTablePaginationProps) {
           onClick={() => handlePageChange(nextLink)}
         />
       </PaginationItem>
-    );
+    )
 
-    const renderedLinks = [];
-    const totalLinks = copyLinks.length;
-    const activeIndex = copyLinks.findIndex((link) => link.active);
+    const renderedLinks = []
+    const totalLinks = copyLinks.length
+    const activeIndex = copyLinks.findIndex((link) => link.active)
 
     if (totalLinks === 0) {
-      return [prevLinkNode, nextLinkNode];
+      return [prevLinkNode, nextLinkNode]
     }
 
     // always add prevBtn and first link
-    renderedLinks.push(prevLinkNode);
-    const firstLink = copyLinks[0];
+    renderedLinks.push(prevLinkNode)
+    const firstLink = copyLinks[0]
     renderedLinks.push(
       <PaginationItem key={firstLink.label}>
         <PaginationLink
@@ -60,7 +60,7 @@ function DataTablePagination({ links }: DataTablePaginationProps) {
           {firstLink.label}
         </PaginationLink>
       </PaginationItem>,
-    );
+    )
 
     // Add left ellipsis if needed
     if (activeIndex > 2) {
@@ -68,21 +68,21 @@ function DataTablePagination({ links }: DataTablePaginationProps) {
         <PaginationItem key="ellipsis-left">
           <PaginationEllipsis />
         </PaginationItem>,
-      );
+      )
     }
 
     // Add middle links
-    const from = Math.max(1, activeIndex - 1);
-    const to = Math.min(totalLinks - 2, activeIndex + 1);
+    const from = Math.max(1, activeIndex - 1)
+    const to = Math.min(totalLinks - 2, activeIndex + 1)
     for (let i = from; i <= to; i++) {
-      const link = copyLinks[i];
+      const link = copyLinks[i]
       renderedLinks.push(
         <PaginationItem key={link.label}>
           <PaginationLink isActive={link.active} onClick={() => handlePageChange(link)}>
             {link.label}
           </PaginationLink>
         </PaginationItem>,
-      );
+      )
     }
 
     // Add right ellipsis if needed
@@ -91,7 +91,7 @@ function DataTablePagination({ links }: DataTablePaginationProps) {
         <PaginationItem key="ellipsis-right">
           <PaginationEllipsis />
         </PaginationItem>,
-      );
+      )
     }
 
     // Always show last page if there's more than 1 page
@@ -105,20 +105,20 @@ function DataTablePagination({ links }: DataTablePaginationProps) {
             {copyLinks[totalLinks - 1]?.label}
           </PaginationLink>
         </PaginationItem>,
-      );
+      )
     }
 
-    renderedLinks.push(nextLinkNode);
-    return renderedLinks;
-  };
+    renderedLinks.push(nextLinkNode)
+    return renderedLinks
+  }
 
   return (
     <Pagination>
       <PaginationContent>{renderLinks()}</PaginationContent>
     </Pagination>
-  );
+  )
 }
 
-export { DataTablePagination };
+export { DataTablePagination }
 
-export type { DataTablePaginationProps };
+export type { DataTablePaginationProps }

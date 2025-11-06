@@ -1,25 +1,25 @@
-import { DataTable } from '@/components/data-table';
-import { DataTableHeader } from '@/components/data-table-header';
-import { DataTablePagination } from '@/components/data-table-pagination';
-import AppLayout from '@/layouts/app-layout';
+import { DataTable } from '@/components/data-table'
+import { DataTableHeader } from '@/components/data-table-header'
+import { DataTablePagination } from '@/components/data-table-pagination'
+import AppLayout from '@/layouts/app-layout'
 import {
   type BreadcrumbItem,
   type HeaderActions,
   type Link,
   type TableData,
   type User,
-} from '@/types';
-import { Head } from '@inertiajs/react';
-import { VisibilityState, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
-import { columns, createFormInputs, createUserValidation } from './form';
+} from '@/types'
+import { Head } from '@inertiajs/react'
+import { VisibilityState, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
+import { columns, createFormInputs, createUserValidation } from './form'
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Users',
     href: '/dashboard/users',
   },
-];
+]
 
 const tableHeaderActions: HeaderActions<typeof createUserValidation> = {
   actions: {
@@ -35,13 +35,13 @@ const tableHeaderActions: HeaderActions<typeof createUserValidation> = {
       },
     },
   },
-};
+}
 
 interface UsersProps {
   users: {
-    data: User[];
-    links: Link[];
-  };
+    data: User[]
+    links: Link[]
+  }
 }
 
 export default function Users({ users }: UsersProps) {
@@ -49,18 +49,18 @@ export default function Users({ users }: UsersProps) {
     () => ({
       columns,
       data: users.data.map((user) => {
-        const role = user.roles[0]?.role;
+        const role = user.roles[0]?.role
         return {
           ...user,
           role,
           password: '',
-        };
+        }
       }),
       links: users.links,
     }),
     [users.data, users.links],
-  );
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  )
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   const table = useReactTable({
     data: tableData.data,
@@ -70,7 +70,7 @@ export default function Users({ users }: UsersProps) {
     state: {
       columnVisibility,
     },
-  });
+  })
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -92,5 +92,5 @@ export default function Users({ users }: UsersProps) {
         </div>
       </div>
     </AppLayout>
-  );
+  )
 }

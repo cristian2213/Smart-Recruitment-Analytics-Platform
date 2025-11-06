@@ -1,11 +1,11 @@
-import AppLogoIcon from '@/components/app-logo-icon';
-import { Link } from '@inertiajs/react';
-import { type PropsWithChildren } from 'react';
+import AppLogoIcon from '@/components/app-logo-icon'
+import { Link } from '@inertiajs/react'
+import { type PropsWithChildren } from 'react'
 
 interface AuthLayoutProps {
-  name?: string;
-  title?: string;
-  description?: string;
+  name?: string
+  title?: string
+  description?: string
 }
 
 export default function AuthSimpleLayout({
@@ -37,5 +37,5 @@ export default function AuthSimpleLayout({
         </div>
       </div>
     </div>
-  );
+  )
 }

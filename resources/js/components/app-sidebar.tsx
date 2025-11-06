@@ -1,6 +1,6 @@
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { NavFooter } from '@/components/nav-footer'
+import { NavMain } from '@/components/nav-main'
+import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
   SidebarContent,
@@ -9,11 +9,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { Briefcase, Folder, LayoutGrid, Users } from 'lucide-react';
-import AppLogo from './app-logo';
+} from '@/components/ui/sidebar'
+import { type NavItem } from '@/types'
+import { Link } from '@inertiajs/react'
+import { Briefcase, Folder, LayoutGrid, Users } from 'lucide-react'
+import AppLogo from './app-logo'
 
 const mainNavItems: NavItem[] = [
   {
@@ -31,7 +31,7 @@ const mainNavItems: NavItem[] = [
     href: '/dashboard/jobs',
     icon: Briefcase,
   },
-];
+]
 
 const footerNavItems: NavItem[] = [
   {
@@ -44,7 +44,7 @@ const footerNavItems: NavItem[] = [
   //   href: 'https://laravel.com/docs/starter-kits#react',
   //   icon: BookOpen,
   // },
-];
+]
 
 export function AppSidebar() {
   return (
@@ -70,5 +70,5 @@ export function AppSidebar() {
         <NavUser />
       </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

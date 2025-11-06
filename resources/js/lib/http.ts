@@ -1,5 +1,5 @@
-import { HTTPSuccessRes } from '@/types';
-import { toast } from 'sonner';
+import { HTTPSuccessRes } from '@/types'
+import { toast } from 'sonner'
 
 export function handleHttpErrors(
   errors: Record<string, string>,
@@ -7,16 +7,16 @@ export function handleHttpErrors(
 ) {
   Object.entries(errors).forEach(([key, error]) => {
     if (key !== '0') {
-      cb?.(key, error);
+      cb?.(key, error)
     } else {
-      toast.error(error);
+      toast.error(error)
     }
-  });
+  })
 }
 
 export function handleHttpSuccess(res: HTTPSuccessRes, description?: string) {
   toast.success(
     res?.props?.message || 'Operation successfully completed',
     description ? { description } : undefined,
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { DynamicForm } from '@/components/dynamic-form';
+import { DynamicForm } from '@/components/dynamic-form'
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -11,61 +11,86 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from '@/components/ui/menubar';
-import { DEBOUNCE_DELAY } from '@/constans/delays';
-import { handleHttpErrors, handleHttpSuccess } from '@/lib/http';
-import { toIsoWithOffset } from '@/lib/time';
-import { getQueryParam, getUrl } from '@/lib/url';
-import { type HeaderActions, type RequestPayload } from '@/types';
-import { router, useForm } from '@inertiajs/react';
-import { Table as ITable } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
-import { type UseFormReturn } from 'react-hook-form';
-import * as z from 'zod';
-import { Modal } from './modal';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+} from '@/components/ui/menubar'
+import { DEBOUNCE_DELAY } from '@/constans/delays'
+import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
+import { toIsoWithOffset } from '@/lib/time'
+import { getQueryParam, getUrl } from '@/lib/url'
+import { type HeaderActions, type RequestPayload } from '@/types'
+import { router, useForm } from '@inertiajs/react'
+import { Table as ITable } from '@tanstack/react-table'
+import { useEffect, useState } from 'react'
+import { type UseFormReturn } from 'react-hook-form'
+import * as z from 'zod'
+import { Modal } from './modal'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
 
 const creationModal = {
   title: 'Create a new Record',
   description: 'Fill the details for the new record. Click save when you&apos;re done.',
   done: 'Create',
-};
+}
 
 export function SearchEngine() {
   const { data, setData, get, processing } = useForm<{ query: string; page?: string }>({
     query: getQueryParam('query'),
-  });
+  })
 
   useEffect(() => {
+    if (data.query === '') return
+
     const timerKey = setTimeout(() => {
       get('', {
         preserveState: true,
-        replace: true, // doesn't track the browser history
-      });
-    }, DEBOUNCE_DELAY);
+        replace: true, // No browser history
+      })
+    }, DEBOUNCE_DELAY)
 
-    return () => clearTimeout(timerKey);
-  }, [data.query, get]);
+    return () => {
+      clearTimeout(timerKey)
+    }
+  }, [data.page, data.query, get])
 
-  const onSetQuery = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setData('query', event.target.value.trim());
-    setData('page', '1');
-  };
+  const resetFilter = () => {
+    const entity = getUrl().pathname.split('/dashboard/')[1]
+    router.get(
+      route(`dashboard.${entity}.index`, {
+        _query: {
+          page: 1,
+        },
+      }),
+      undefined,
+      {
+        replace: true,
+        preserveState: false,
+      },
+    )
+  }
+  const resetPage = () => setData('page', '1')
 
-  const onHttpFilterReset = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (data.query === '') return;
-    setData('query', '');
-    setData('page', '1');
-  };
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const queryValue = event.target.value.trim()
+    if (queryValue === '') {
+      resetFilter()
+      return
+    }
+    setData('query', queryValue)
+    resetPage()
+  }
+
+  const handleFilterReset = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (data.query === '') return
+    resetFilter()
+  }
 
   return (
-    <form onSubmit={onHttpFilterReset} className="flex gap-2">
+    <form onSubmit={handleFilterReset} className="flex gap-2">
       <Input
         type="search"
         value={data.query}
-        onChange={onSetQuery}
+        onChange={handleChange}
         placeholder="Search"
         maxLength={100}
         className="w-70"
@@ -75,23 +100,23 @@ export function SearchEngine() {
         Reset
       </Button>
     </form>
-  );
+  )
 }
 
 interface DataTableHeaderProps<TData, TFormSchema extends z.ZodType> {
-  table: ITable<TData>;
-  headerActions: HeaderActions<TFormSchema>;
+  table: ITable<TData>
+  headerActions: HeaderActions<TFormSchema>
 }
 
 function DataTableHeader<TData, TFormSchema extends z.ZodType>({
   table,
   headerActions,
 }: DataTableHeaderProps<TData, TFormSchema>) {
-  const { actions } = headerActions;
-  const [showCreationForm, setCreationForm] = useState<boolean>(false);
+  const { actions } = headerActions
+  const [showCreationForm, setCreationForm] = useState<boolean>(false)
   const [formDefValues, setFormDefValues] = useState<z.infer<TFormSchema>>(
     actions.create.defaultValues as z.infer<TFormSchema>,
-  );
+  )
 
   const getVisibleColumns = () => {
     return table
@@ -107,38 +132,38 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           >
             {column.id}
           </MenubarCheckboxItem>
-        );
-      });
-  };
+        )
+      })
+  }
 
   const onHttpCreate = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
-    const createdAt = toIsoWithOffset(new Date());
+    const createdAt = toIsoWithOffset(new Date())
 
-    const payload = { ...(data as Record<string, unknown>), created_at: createdAt };
+    const payload = { ...(data as Record<string, unknown>), created_at: createdAt }
 
-    setFormDefValues(payload as z.infer<TFormSchema>);
+    setFormDefValues(payload as z.infer<TFormSchema>)
 
     router.post(getUrl().pathname, payload as RequestPayload, {
       preserveState: true,
       onSuccess: (res) => {
-        handleHttpSuccess(res);
-        form.reset();
-        setCreationForm(false);
-        setFormDefValues(actions.create.defaultValues);
+        handleHttpSuccess(res)
+        form.reset()
+        setCreationForm(false)
+        setFormDefValues(actions.create.defaultValues)
       },
       onError: (errors) => {
         handleHttpErrors(errors, (key, error) =>
           form.setError(key, {
             message: error,
           }),
-        );
+        )
       },
-    });
-  };
+    })
+  }
 
   const onHttpDownload = () => {
-    window.location.href = route('users.download');
-  };
+    window.location.href = route('users.download')
+  }
 
   return (
     <div className="mb-4 flex justify-between">
@@ -220,9 +245,9 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
         <SearchEngine />
       </div>
     </div>
-  );
+  )
 }
 
-export { DataTableHeader };
+export { DataTableHeader }
 
-export type { DataTableHeaderProps };
+export type { DataTableHeaderProps }

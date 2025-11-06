@@ -3,24 +3,24 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { UserInfo } from '@/components/user-info';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { type User } from '@/types';
-import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+} from '@/components/ui/dropdown-menu'
+import { UserInfo } from '@/components/user-info'
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation'
+import { type User } from '@/types'
+import { Link, router } from '@inertiajs/react'
+import { LogOut, Settings } from 'lucide-react'
 
 interface UserMenuContentProps {
-  user: User;
+  user: User
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
-  const cleanup = useMobileNavigation();
+  const cleanup = useMobileNavigation()
 
   const handleLogout = () => {
-    cleanup();
-    router.flushAll();
-  };
+    cleanup()
+    router.flushAll()
+  }
 
   return (
     <>
@@ -58,5 +58,5 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         </Link>
       </DropdownMenuItem>
     </>
-  );
+  )
 }

@@ -1,12 +1,12 @@
-import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { useForm } from '@inertiajs/react'
+import { FormEventHandler, useRef } from 'react'
 
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import InputError from '@/components/input-error'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-import HeadingSmall from '@/components/heading-small';
+import HeadingSmall from '@/components/heading-small'
 
 import {
   Dialog,
@@ -16,10 +16,10 @@ import {
   DialogFooter,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog'
 
 export default function DeleteUser() {
-  const passwordInput = useRef<HTMLInputElement>(null);
+  const passwordInput = useRef<HTMLInputElement>(null)
   const {
     data,
     setData,
@@ -28,23 +28,23 @@ export default function DeleteUser() {
     reset,
     errors,
     clearErrors,
-  } = useForm<Required<{ password: string }>>({ password: '' });
+  } = useForm<Required<{ password: string }>>({ password: '' })
 
   const deleteUser: FormEventHandler = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     destroy(route('profile.destroy'), {
       preserveScroll: true,
       onSuccess: () => closeModal(),
       onError: () => passwordInput.current?.focus(),
       onFinish: () => reset(),
-    });
-  };
+    })
+  }
 
   const closeModal = () => {
-    clearErrors();
-    reset();
-  };
+    clearErrors()
+    reset()
+  }
 
   return (
     <div className="space-y-6">
@@ -105,5 +105,5 @@ export default function DeleteUser() {
         </Dialog>
       </div>
     </div>
-  );
+  )
 }

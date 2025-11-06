@@ -7,15 +7,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@/components/ui/alert-dialog'
 
 interface ConfirmationAlertProps {
-  title: string;
-  description: string;
-  isOpen: boolean;
-  onOpen: (open: boolean) => void;
-  onConfirm: () => void;
-  onCancel: () => void;
+  title: string
+  description: string
+  isOpen: boolean
+  onOpen: (open: boolean) => void
+  onConfirm: () => void
+  onCancel: () => void
 }
 
 function ConfirmationAlert({
@@ -38,7 +38,7 @@ function ConfirmationAlert({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }
 
-export { ConfirmationAlert };
+export { ConfirmationAlert }

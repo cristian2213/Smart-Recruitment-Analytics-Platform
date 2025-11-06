@@ -1,8 +1,8 @@
-import { Badge } from '@/components/ui/badge';
-import { type DynamicFormInputProps, type TRole, type User } from '@/types';
-import { ColumnDef } from '@tanstack/react-table';
-import * as z from 'zod';
-import { RowActions } from './row-actions';
+import { Badge } from '@/components/ui/badge'
+import { type DynamicFormInputProps, type TRole, type User } from '@/types'
+import { ColumnDef } from '@tanstack/react-table'
+import * as z from 'zod'
+import { RowActions } from './row-actions'
 
 const columns: ColumnDef<User>[] = [
   {
@@ -25,20 +25,20 @@ const columns: ColumnDef<User>[] = [
     accessorKey: 'roles',
     header: 'Role',
     cell: ({ row }) => {
-      const roles = row.getValue('roles') as { role: TRole }[];
-      const role = roles.length > 0 ? roles[0].role : 'N/A';
+      const roles = row.getValue('roles') as { role: TRole }[]
+      const role = roles.length > 0 ? roles[0].role : 'N/A'
       return (
         <Badge variant="highlight" className="text-xs">
           {role}
         </Badge>
-      );
+      )
     },
   },
   {
     accessorKey: 'email_verified_at',
     header: 'Verified at',
     cell: ({ row }) => {
-      const verifiedAt = row.getValue('email_verified_at') as string | null;
+      const verifiedAt = row.getValue('email_verified_at') as string | null
       return (
         <Badge
           variant={verifiedAt == null ? 'destructive' : 'outline'}
@@ -46,16 +46,16 @@ const columns: ColumnDef<User>[] = [
         >
           {verifiedAt == null ? 'unconfirmed' : verifiedAt}
         </Badge>
-      );
+      )
     },
   },
   {
     accessorKey: 'updated_at',
     header: 'Updated at',
     cell: ({ row }) => {
-      const date = row.getValue('updated_at') as string;
-      const formattedDate = date ? new Date(date).toLocaleString() : 'N/A';
-      return <span className="text-xs">{formattedDate}</span>;
+      const date = row.getValue('updated_at') as string
+      const formattedDate = date ? new Date(date).toLocaleString() : 'N/A'
+      return <span className="text-xs">{formattedDate}</span>
     },
   },
   {
@@ -63,7 +63,7 @@ const columns: ColumnDef<User>[] = [
     header: 'Actions',
     cell: (data) => <RowActions {...data} />,
   },
-];
+]
 
 const createUserValidation = z.object({
   name: z
@@ -92,7 +92,7 @@ const createUserValidation = z.object({
       message: 'Password must contain at least one special character.',
     }),
   role: z.string().min(1, 'Role is required.'),
-});
+})
 
 const updateUserValidation = createUserValidation.extend({
   password: z
@@ -112,7 +112,7 @@ const updateUserValidation = createUserValidation.extend({
       message: 'Password must contain at least one special character.',
     })
     .or(z.literal('')),
-});
+})
 
 const createFormInputs: DynamicFormInputProps[] = [
   {
@@ -168,9 +168,9 @@ const createFormInputs: DynamicFormInputProps[] = [
       },
     ],
   },
-];
+]
 
-const updateFormInputs = createFormInputs.filter((input) => input.name !== 'role');
+const updateFormInputs = createFormInputs.filter((input) => input.name !== 'role')
 
 export {
   columns,
@@ -178,4 +178,4 @@ export {
   createUserValidation,
   updateFormInputs,
   updateUserValidation,
-};
+}

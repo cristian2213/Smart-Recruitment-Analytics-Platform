@@ -1,39 +1,39 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Icon } from '@/components/icon';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Breadcrumbs } from '@/components/breadcrumbs'
+import { Icon } from '@/components/icon'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
   navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
+} from '@/components/ui/navigation-menu'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@/components/ui/sheet'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { UserMenuContent } from '@/components/user-menu-content';
-import { useInitials } from '@/hooks/use-initials';
-import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
-import AppLogo from './app-logo';
-import AppLogoIcon from './app-logo-icon';
+} from '@/components/ui/tooltip'
+import { UserMenuContent } from '@/components/user-menu-content'
+import { useInitials } from '@/hooks/use-initials'
+import { cn } from '@/lib/utils'
+import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types'
+import { Link, usePage } from '@inertiajs/react'
+import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react'
+import AppLogo from './app-logo'
+import AppLogoIcon from './app-logo-icon'
 
 const mainNavItems: NavItem[] = [
   {
@@ -41,7 +41,7 @@ const mainNavItems: NavItem[] = [
     href: '/dashboard',
     icon: LayoutGrid,
   },
-];
+]
 
 const rightNavItems: NavItem[] = [
   {
@@ -54,18 +54,18 @@ const rightNavItems: NavItem[] = [
     href: 'https://laravel.com/docs/starter-kits#react',
     icon: BookOpen,
   },
-];
+]
 
-const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
+const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100'
 
 interface AppHeaderProps {
-  breadcrumbs?: BreadcrumbItem[];
+  breadcrumbs?: BreadcrumbItem[]
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-  const page = usePage<SharedData>();
-  const { auth } = page.props;
-  const getInitials = useInitials();
+  const page = usePage<SharedData>()
+  const { auth } = page.props
+  const getInitials = useInitials()
   return (
     <>
       <div className="border-b border-sidebar-border/80">
@@ -219,5 +219,5 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         </div>
       )}
     </>
-  );
+  )
 }

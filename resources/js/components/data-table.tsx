@@ -5,20 +5,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { flexRender, Table as ITable } from '@tanstack/react-table';
-import { useEffect } from 'react';
+} from '@/components/ui/table'
+import { flexRender, Table as ITable } from '@tanstack/react-table'
+import { useEffect } from 'react'
 
 interface DataTableProps<TData> {
-  table: ITable<TData>;
+  table: ITable<TData>
 }
 
 function DataTable<TData>({ table }: DataTableProps<TData>) {
   useEffect(() => {
-    console.log('DataTable - Rendering...');
+    console.log('DataTable - Rendering...')
 
-    return () => console.log('DataTable - Deleting...');
-  }, []);
+    return () => console.log('DataTable - Deleting...')
+  }, [])
   return (
     <>
       <Table>
@@ -32,7 +32,7 @@ function DataTable<TData>({ table }: DataTableProps<TData>) {
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
-                );
+                )
               })}
             </TableRow>
           ))}
@@ -59,7 +59,7 @@ function DataTable<TData>({ table }: DataTableProps<TData>) {
         </TableBody>
       </Table>
     </>
-  );
+  )
 }
 
-export { DataTable };
+export { DataTable }
