@@ -21,7 +21,7 @@ import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
-import { updateFormInputs, updateUserValidation } from './form'
+import { updateFormInputs, updateUserValidation } from './forms'
 
 const editionModal = {
   title: 'Edit a Record',

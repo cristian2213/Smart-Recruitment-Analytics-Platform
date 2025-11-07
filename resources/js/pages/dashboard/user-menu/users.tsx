@@ -12,7 +12,8 @@ import {
 import { Head } from '@inertiajs/react'
 import { VisibilityState, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
-import { columns, createFormInputs, createUserValidation } from './form'
+import { columns } from './columns'
+import { createFormInputs, createUserValidation } from './forms'
 
 const breadcrumbs: BreadcrumbItem[] = [
   {

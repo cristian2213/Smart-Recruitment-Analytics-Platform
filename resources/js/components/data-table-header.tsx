@@ -19,10 +19,12 @@ import { getQueryParam, getUrl } from '@/lib/url'
 import { type HeaderActions, type RequestPayload } from '@/types'
 import { router, useForm } from '@inertiajs/react'
 import { Table as ITable } from '@tanstack/react-table'
-import { useEffect, useState } from 'react'
+import { format } from 'date-fns'
+import { useEffect, useReducer, useState } from 'react'
 import { type UseFormReturn } from 'react-hook-form'
 import * as z from 'zod'
 import { Modal } from './modal'
+import { RangePicker } from './range-picker'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 
@@ -30,6 +32,12 @@ const creationModal = {
   title: 'Create a new Record',
   description: 'Fill the details for the new record. Click save when you&apos;re done.',
   done: 'Create',
+}
+
+const downloadRecordsModal = {
+  title: 'Download a new Record',
+  description: 'Select the date range',
+  done: 'Download',
 }
 
 export function SearchEngine() {
@@ -103,6 +111,33 @@ export function SearchEngine() {
   )
 }
 
+type ModalType = 'downloadRecords' | 'example'
+type ModalState = {
+  [key in ModalType]: boolean
+}
+type Action =
+  | { type: 'OPEN_MODAL'; modal: ModalType }
+  | { type: 'CLOSE_MODAL'; modal: ModalType }
+  | { type: 'TOGGLE_MODAL'; modal: ModalType }
+  | { type: 'CLOSE_ALL' }
+function modalReducer(state: ModalState, action: Action): ModalState {
+  switch (action.type) {
+    case 'OPEN_MODAL':
+      return { ...state, [action.modal]: true }
+    case 'CLOSE_MODAL':
+      return { ...state, [action.modal]: false }
+    case 'TOGGLE_MODAL':
+      return { ...state, [action.modal]: !state[action.modal] }
+    case 'CLOSE_ALL':
+      return Object.keys(state).reduce(
+        (acc, key) => ({ ...acc, [key]: false }),
+        {} as ModalState,
+      )
+    default:
+      return state
+  }
+}
+
 interface DataTableHeaderProps<TData, TFormSchema extends z.ZodType> {
   table: ITable<TData>
   headerActions: HeaderActions<TFormSchema>
@@ -117,6 +152,10 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
   const [formDefValues, setFormDefValues] = useState<z.infer<TFormSchema>>(
     actions.create.defaultValues as z.infer<TFormSchema>,
   )
+  const [state, dispatch] = useReducer(modalReducer, {
+    downloadRecords: false,
+    example: false,
+  })
 
   const getVisibleColumns = () => {
     return table
@@ -136,7 +175,7 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
       })
   }
 
-  const onHttpCreate = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
+  const handleHttpCreate = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
     const createdAt = toIsoWithOffset(new Date())
 
     const payload = { ...(data as Record<string, unknown>), created_at: createdAt }
@@ -161,8 +200,16 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
     })
   }
 
-  const onHttpDownload = () => {
-    window.location.href = route('users.download')
+  const handleDownloadModal = () =>
+    dispatch({ type: 'TOGGLE_MODAL', modal: 'downloadRecords' })
+
+  const handleHttpDownload = ({ from, to }: { from: Date; to: Date }) => {
+    window.location.href = route('users.download', {
+      _query: {
+        from: format(from, 'yyyy-MM-dd'),
+        to: format(to, 'yyyy-MM-dd'),
+      },
+    })
   }
 
   return (
@@ -177,8 +224,15 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           inputs={actions.create.userFormInputs}
           schema={actions.create.schema}
           defaultValues={formDefValues}
-          onSubmit={onHttpCreate}
+          onSubmit={handleHttpCreate}
         />
+      </Modal>
+      <Modal
+        text={downloadRecordsModal}
+        isOpen={state.downloadRecords}
+        onOpenChange={handleDownloadModal}
+      >
+        <RangePicker onSubmit={handleHttpDownload} />
       </Modal>
       {/* ****** END BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
 
@@ -218,7 +272,7 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           <MenubarMenu>
             <MenubarTrigger>Archivable</MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={onHttpDownload}>
+              <MenubarItem onClick={handleDownloadModal}>
                 Export Data <MenubarShortcut>⌘T</MenubarShortcut>
               </MenubarItem>
               <MenubarSub>
