@@ -108,6 +108,6 @@ class User extends Authenticatable
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }

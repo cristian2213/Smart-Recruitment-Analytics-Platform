@@ -15,6 +15,8 @@ enum PermissionEnum: string
     case UpdateOwnUsers = 'update_own_users';
     case DeleteUsers = 'delete_users';
     case DeleteOwnUsers = 'delete_own_users';
+    case DownloadUsers = 'download_users';
+    case DownloadOwnUsers = 'download_own_users';
 
     case ViewJobs = 'view_jobs'; // view
     case CreateJobs = 'create_jobs'; // actions 👇

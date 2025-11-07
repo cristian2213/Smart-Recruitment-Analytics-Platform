@@ -24,19 +24,16 @@ import * as z from 'zod'
 import { updateFormInputs, updateUserValidation } from './forms'
 
 const editionModal = {
-  title: 'Edit a Record',
+  title: 'Edit Record',
   description: 'Modify the inputs as you wish. Click Edit when you&apos;re done.',
   done: 'Edit',
 }
 
 function RowActions(props: CellContext<User, unknown>) {
-  // const page = usePage(); // development purpose
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false)
   const [isCreateFormOpen, setCreateForm] = useState<boolean>(false)
   const { row } = props
   const id = row.original.uuid
-
-  // ACTION HANDLES
 
   const onOpenConfAlert = () => {
     setIsAlertOpen((preVal) => {
@@ -52,8 +49,6 @@ function RowActions(props: CellContext<User, unknown>) {
       toast.success('Record ID copied to clipboard')
     })
   }
-
-  // HTTP METHODS
 
   const onHttpDelete = () => {
     const url = addSubPathToUrl(getUrl(), id)
@@ -87,10 +82,6 @@ function RowActions(props: CellContext<User, unknown>) {
       },
     })
   }
-
-  // development purpose
-  // console.log('Row:', row.getValue('roles'));
-  // console.log('Page:', page);
 
   return (
     <>

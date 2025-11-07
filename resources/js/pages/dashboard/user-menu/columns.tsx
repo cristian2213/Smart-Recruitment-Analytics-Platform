@@ -35,6 +35,20 @@ const columns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: 'creator',
+    header: 'Created by',
+    cell: ({ row }) => {
+      const creator = row.getValue('creator') as { id: string; name: string } | null
+      if (!creator) return 'None'
+      const text = `${creator.id}-${creator.name}`
+      return (
+        <Badge variant="secondary" className="text-xs">
+          {text}
+        </Badge>
+      )
+    },
+  },
+  {
     accessorKey: 'email_verified_at',
     header: 'Verified at',
     cell: ({ row }) => {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Enums\User\PermissionEnum;
 use App\Enums\User\RoleEnum;
+use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UserRequest;
 use App\Models\Role;
@@ -15,9 +16,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Str;
 
 class UserController extends Controller
 {
@@ -43,13 +44,10 @@ class UserController extends Controller
 
         $searchCb = function (Builder $query) use ($searchQuery) {
             $query->where(function ($q) use ($searchQuery) {
-                $q->where('uuid', 'like', "%{$searchQuery}%")
+                $q->where('id', 'like', "%{$searchQuery}%")
                     ->orWhere('name', 'like', "%{$searchQuery}%")
                     ->orWhere('last_name', 'like', "%{$searchQuery}%")
                     ->orWhere('email', 'like', "%{$searchQuery}%")
-                    // ->orWhereHas('creator', function ($subQ) use ($searchQuery) {
-                    //     $subQ->where('name', 'like', "%{$searchQuery}%");
-                    // })
                     ->orWhereHas('roles', function ($subQ) use ($searchQuery) {
                         $subQ->where('role', 'like', "%{$searchQuery}%");
                     })
@@ -58,8 +56,17 @@ class UserController extends Controller
         };
 
         $users = match ($role) {
-            RoleEnum::Admin->value => User::with('roles:id,role')
-                ->select('id', 'uuid', 'name', 'last_name', 'email', 'email_verified_at', 'updated_at')
+            RoleEnum::Admin->value => User::with(['creator:id,name', 'roles:id,role'])
+                ->select([
+                    'id',
+                    'uuid',
+                    'name',
+                    'last_name',
+                    'email',
+                    'email_verified_at',
+                    'updated_at',
+                    'created_by',
+                ])
                 ->when($searchQuery, $searchCb)
                 ->latest('id')
                 ->paginate(10)
@@ -271,5 +278,24 @@ class UserController extends Controller
         $user->delete();
 
         return back()->with('message', 'User deleted successfully.');
+    }
+
+    public function download_users(Request $request)
+    {
+        if (
+            ! $this->userCan(PermissionEnum::DownloadUsers) &&
+            ! $this->userCan(PermissionEnum::DownloadOwnUsers)
+        ) {
+            return back()->withErrors('You do not have permissions to download users.');
+        }
+
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        $file_name = 'users-'.$from.'_'.$to.'.xlsx';
+
+        return (new UsersExport($from, $to))->download(
+            $file_name,
+        );
     }
 }

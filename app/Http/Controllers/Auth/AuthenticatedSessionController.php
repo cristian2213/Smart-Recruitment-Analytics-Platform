@@ -32,12 +32,12 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        $permissions = Auth::user()->roles()->first()->permissions()->get()->toArray();
-        $permissions = array_map(fn ($permission) => [
-            'id' => $permission['id'],
-            'name' => $permission['permission'],
-        ], $permissions);
-        $request->session()->put('permissions', $permissions);
+        // $permissions = Auth::user()->roles()->first()->permissions()->get()->toArray();
+        // $permissions = array_map(fn ($permission) => [
+        //     'id' => $permission['id'],
+        //     'name' => $permission['permission'],
+        // ], $permissions);
+        // $request->session()->put('permissions', $permissions);
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

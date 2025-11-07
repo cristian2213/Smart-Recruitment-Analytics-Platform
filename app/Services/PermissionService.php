@@ -16,6 +16,7 @@ class PermissionService
             PermissionEnum::ReadUsers,
             PermissionEnum::UpdateUsers,
             PermissionEnum::DeleteUsers,
+            PermissionEnum::DownloadUsers,
 
             PermissionEnum::ViewJobs,
             PermissionEnum::CreateJobs,
@@ -32,13 +33,13 @@ class PermissionService
             PermissionEnum::ReadOwnUsers,
             PermissionEnum::UpdateOwnUsers,
             PermissionEnum::DeleteOwnUsers,
+            PermissionEnum::DownloadOwnUsers,
 
             PermissionEnum::ViewJobs,
             PermissionEnum::CreateJobs,
             PermissionEnum::ReadOwnJobs,
             PermissionEnum::UpdateOwnJobs,
             PermissionEnum::DeleteOwnJobs,
-
         ],
 
         RoleEnum::Recruiter->value => [
