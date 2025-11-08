@@ -111,7 +111,7 @@ export function SearchEngine() {
   )
 }
 
-type ModalType = 'downloadRecords' | 'example'
+type ModalType = 'downloadRecords' | 'createRecord'
 type ModalState = {
   [key in ModalType]: boolean
 }
@@ -148,13 +148,12 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
   headerActions,
 }: DataTableHeaderProps<TData, TFormSchema>) {
   const { actions } = headerActions
-  const [showCreationForm, setCreationForm] = useState<boolean>(false)
   const [formDefValues, setFormDefValues] = useState<z.infer<TFormSchema>>(
     actions.create.defaultValues as z.infer<TFormSchema>,
   )
   const [state, dispatch] = useReducer(modalReducer, {
     downloadRecords: false,
-    example: false,
+    createRecord: false,
   })
 
   const getVisibleColumns = () => {
@@ -175,6 +174,9 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
       })
   }
 
+  const handleCreateModal = () =>
+    dispatch({ type: 'TOGGLE_MODAL', modal: 'createRecord' })
+
   const handleHttpCreate = (data: z.infer<TFormSchema>, form: UseFormReturn) => {
     const createdAt = toIsoWithOffset(new Date())
 
@@ -185,12 +187,14 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
     router.post(getUrl().pathname, payload as RequestPayload, {
       preserveState: true,
       onSuccess: (res) => {
+        console.log('handleCreateModal-Res', res)
         handleHttpSuccess(res)
         form.reset()
-        setCreationForm(false)
+        handleCreateModal()
         setFormDefValues(actions.create.defaultValues)
       },
       onError: (errors) => {
+        console.log('handleCreateModal-onError', errors)
         handleHttpErrors(errors, (key, error) =>
           form.setError(key, {
             message: error,
@@ -217,8 +221,8 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
       {/* ****** BLOCK CODE TO ATTACH MODAL COMPONENTS ****** */}
       <Modal
         text={creationModal}
-        isOpen={showCreationForm}
-        onOpenChange={setCreationForm}
+        isOpen={state.createRecord}
+        onOpenChange={handleCreateModal}
       >
         <DynamicForm<TFormSchema>
           inputs={actions.create.userFormInputs}
@@ -241,7 +245,7 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
           <MenubarMenu>
             <MenubarTrigger>Actions</MenubarTrigger>
             <MenubarContent>
-              <MenubarItem onClick={() => setCreationForm((preVal) => !preVal)}>
+              <MenubarItem onClick={handleCreateModal}>
                 Create <MenubarShortcut>⌘C</MenubarShortcut>
               </MenubarItem>
               {/* <MenubarItem data-action={ActionTypeEnum.DELETE} onClick={handleActions}>

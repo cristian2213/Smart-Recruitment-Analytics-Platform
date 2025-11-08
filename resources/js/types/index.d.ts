@@ -105,14 +105,21 @@ export interface Link {
   url: string
 }
 
+export interface FileOpts {
+  accept: string
+  multiple?: boolean
+  name: string
+}
+
 // ***** START - DYNAMIC FORM INTERFACES *****
 export interface DynamicFormInputProps {
   name: string
   htmlElement: 'input' | 'textarea' | 'select'
-  type: 'text' | 'password' | 'email'
+  type: 'text' | 'password' | 'email' | 'file'
   label: string
   placeholder?: string
   options?: { value: string; label: string }[]
+  fileOpts?: FileOpts
 }
 // ********************************************
 
@@ -132,4 +139,3 @@ export interface HeaderActions<TFormSchema extends z.ZodTypeAny> {
     }
   }
 }
-// ********************************************

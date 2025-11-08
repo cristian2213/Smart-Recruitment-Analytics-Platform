@@ -10,6 +10,7 @@ use App\Http\Requests\User\UserRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
+use App\Services\StorageService;
 use App\Services\UrlGenerator;
 use App\Traits\UserAccessTrait;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +26,8 @@ class UserController extends Controller
     use UserAccessTrait;
 
     public function __construct(
-        private readonly UrlGenerator $url_generator
+        private readonly UrlGenerator $url_generator,
+        private readonly StorageService $storage_service,
     ) {}
 
     /**
@@ -105,6 +107,24 @@ class UserController extends Controller
         }
 
         $user = User::create($validated);
+
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+
+            $file_name = Str::random(6).'.'.$avatar->extension();
+
+            $save_path = "users/{$user->id}/avatar/{$file_name}";
+
+            $s3_path = $this->storage_service->uploadToS3(
+                $avatar,
+                $save_path,
+            );
+
+            if ($s3_path) {
+                $validated['avatar'] = $s3_path;
+            }
+        }
+
         $role = Role::where('role', $validated['role'])->first();
         $user->roles()->attach($role->id);
         $verification_url = $this->url_generator->generateSignedUrl(

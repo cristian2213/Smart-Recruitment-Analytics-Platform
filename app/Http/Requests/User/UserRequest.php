@@ -37,6 +37,9 @@ class UserRequest extends FormRequest
                 'password' => [
                     'required', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
                 ],
+                'avatar' => [
+                    'nullable', 'image', 'mimes:png,jpg,jpeg', 'max:1024',
+                ],
                 'created_at' => ['required', 'date_format:Y-m-d\TH:i:sP'],
                 'role' => ['required', 'string', 'exists:roles,role'],
             ];
