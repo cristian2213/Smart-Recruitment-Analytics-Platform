@@ -30,6 +30,28 @@ services:
             MP_SMTP_AUTH_ACCEPT_ANY: 1
             MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
+    # File Storage
+    minio:
+        image: minio/minio
+        container_name: minio-storage
+        env_file:
+            - ./.env
+        environment:
+            MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
+            MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
+            MINIO_SERVER_URL: ${AWS_ENDPOINT}
+            MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
+        volumes:
+            - minio-data:/data
+        ports:
+            #  Connection to "S3"
+            - "9000:9000"
+            # Console port for GUI
+            - "9001:9001"
+        networks:
+            - analytics-platform
+        command: server /data --console-address ":9001"
+
     # Cache & Queues
     redis:
         image: redis:7-alpine
@@ -51,22 +73,6 @@ services:
             - redisinsight-data:/db
         networks:
             - analytics-platform
-
-    # File Storage
-    minio:
-        image: minio/minio
-        container_name: recruitment-minio
-        ports:
-            - "9000:9000"
-            - "9001:9001"
-        environment:
-            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-        volumes:
-            - minio-data:/data
-        networks:
-            - analytics-platform
-        command: server /data --console-address ":9001"
 
     # Laravel Application
     app:
