@@ -81,7 +81,6 @@ class UserFactory extends Factory
         $applicantRole = Role::where('role', RoleEnum::Applicant)->first();
 
         return $this->state(fn (array $attributes) => [
-            'email' => 'applicant@test.com',
         ])->hasAttached($applicantRole, ['created_at' => now()]);
     }
 }

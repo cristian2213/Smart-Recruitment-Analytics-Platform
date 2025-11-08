@@ -49,7 +49,7 @@ class StorageService
             // Open file stream
             $stream = fopen($file->getRealPath(), 'r');
             if ($stream === false) {
-                throw new RuntimeException("Cannot open file stream for {$file->getClientOriginalName()}");
+                return false;
             }
 
             // Merge default options with provided options
@@ -73,7 +73,7 @@ class StorageService
                 fclose($stream);
             }
 
-            throw $e;
+            return false;
         }
     }
 
