@@ -65,6 +65,7 @@ class UserController extends Controller
                     'name',
                     'last_name',
                     'email',
+                    'avatar',
                     'email_verified_at',
                     'updated_at',
                     'created_by',
@@ -118,10 +119,15 @@ class UserController extends Controller
             $s3_path = $this->storage_service->uploadToS3(
                 $avatar,
                 $save_path,
+                's3',
+                [
+                    'ACL' => 'public-read',
+                    'visibility' => 'public-read ',
+                ]
             );
 
             if ($s3_path) {
-                $validated['avatar'] = $s3_path;
+                $user->update(['avatar' => $s3_path]);
             }
         }
 

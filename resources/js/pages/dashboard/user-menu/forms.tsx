@@ -91,13 +91,6 @@ const createFormInputs: DynamicFormInputProps[] = [
     type: 'email',
   },
   {
-    name: 'password',
-    label: 'Password',
-    placeholder: 'Enter password',
-    htmlElement: 'input',
-    type: 'password',
-  },
-  {
     name: 'avatar',
     label: 'Upload avatar',
     htmlElement: 'input',
@@ -107,6 +100,13 @@ const createFormInputs: DynamicFormInputProps[] = [
       accept: 'jpg,.jpeg,.png',
       multiple: false,
     },
+  },
+  {
+    name: 'password',
+    label: 'Password',
+    placeholder: 'Enter password',
+    htmlElement: 'input',
+    type: 'password',
   },
   {
     name: 'role',
