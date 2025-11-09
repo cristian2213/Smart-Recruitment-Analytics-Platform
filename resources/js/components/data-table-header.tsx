@@ -104,7 +104,12 @@ export function SearchEngine() {
         className="w-70"
       />
 
-      <Button type="submit" disabled={processing} variant="secondary">
+      <Button
+        type="submit"
+        disabled={processing}
+        variant="secondary"
+        className="cursor-pointer"
+      >
         Reset
       </Button>
     </form>

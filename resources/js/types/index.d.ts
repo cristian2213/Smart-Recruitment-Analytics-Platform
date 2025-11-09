@@ -79,7 +79,7 @@ export interface User {
   uuid: string
   name: string
   email: string
-  avatar?: string
+  avatar?: string | File
   email_verified_at: string | null
   roles: Role[]
   role: string

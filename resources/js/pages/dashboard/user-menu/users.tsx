@@ -46,6 +46,41 @@ interface UsersProps {
 }
 
 export default function Users({ users }: UsersProps) {
+  // const [avatarFiles, setAvatarFiles] = useState<{ [key: string]: File }>({})
+
+  // useEffect(() => {
+  //   return
+  //   const fetchAvatars = async () => {
+  //     const newAvatarFiles: { [key: string]: File } = {}
+
+  //     for (const user of users.data) {
+  //       if (user.avatar) {
+  //         try {
+  //           const avatarUrl = `http://localhost:9000/dashboard/${user.avatar}`
+  //           const response = await fetch(avatarUrl)
+  //           const blob = await response.blob()
+
+  //           // Extract file extension from the URL or use a default
+  //           const extension = user.avatar.split('.').pop() || 'jpg'
+  //           const contentType = `image/${extension}`
+
+  //           const file = new File([blob], `avatar-${user.id}.${extension}`, {
+  //             type: contentType,
+  //           })
+
+  //           newAvatarFiles[user.id] = file
+  //         } catch (error) {
+  //           console.error(`Failed to fetch avatar for user ${user.id}:`, error)
+  //         }
+  //       }
+  //     }
+
+  //     setAvatarFiles(newAvatarFiles)
+  //   }
+
+  //   fetchAvatars()
+  // }, [users.data])
+
   const tableData: TableData<User> = useMemo(
     () => ({
       columns,

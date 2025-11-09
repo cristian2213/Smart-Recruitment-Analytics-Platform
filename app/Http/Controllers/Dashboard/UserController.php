@@ -114,16 +114,12 @@ class UserController extends Controller
 
             $file_name = Str::random(6).'.'.$avatar->extension();
 
-            $save_path = "users/{$user->id}/avatar/{$file_name}";
+            $save_path = "users/public/{$user->id}/avatar/{$file_name}";
 
             $s3_path = $this->storage_service->uploadToS3(
                 $avatar,
                 $save_path,
                 's3',
-                [
-                    'ACL' => 'public-read',
-                    'visibility' => 'public-read ',
-                ]
             );
 
             if ($s3_path) {
@@ -215,7 +211,6 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, string $id)
     {
-
         if (
             ! $this->userCan(PermissionEnum::UpdateUsers) &&
             ! $this->userCan(PermissionEnum::UpdateOwnUsers)
@@ -263,6 +258,27 @@ class UserController extends Controller
             $user->notify(
                 new VerifyEmailNotification($verification_url)
             );
+        }
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                $old_path = explode(config('filesystems.disks.s3.bucket').'/', $user->avatar)[1];
+                $this->storage_service->delete_from_s3($old_path);
+            }
+
+            $avatar = $request->file('avatar');
+            $file_name = Str::random(6).'.'.$avatar->extension();
+            $save_path = "users/public/{$user->id}/avatar/{$file_name}";
+
+            $s3_path = $this->storage_service->uploadToS3(
+                $avatar,
+                $save_path,
+                's3',
+            );
+
+            if ($s3_path) {
+                $validated['avatar'] = $s3_path;
+            }
         }
 
         $user->update($validated);

@@ -56,37 +56,37 @@ function DynamicForm<TFormSchema extends z.ZodType<any>>({
         fileOpts,
       } = input
 
-      if (element === 'input' && type === 'file') {
-        return (
-          <Controller
-            key={name}
-            name={name}
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={name}>{label}</FieldLabel>
-                <Input
-                  id={name}
-                  type="file"
-                  aria-invalid={fieldState.invalid}
-                  {...fileOpts}
-                  name={field.name}
-                  onChange={(event) => {
-                    const files = event.target.files
-                    if (!files) return
-
-                    const values = fileOpts?.multiple ? files : files[0]
-                    field.onChange(values)
-                  }}
-                />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-        )
-      }
-
       if (element === 'input') {
+        if (type === 'file') {
+          return (
+            <Controller
+              key={name}
+              name={name}
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                  <Input
+                    id={name}
+                    type="file"
+                    aria-invalid={fieldState.invalid}
+                    {...fileOpts}
+                    name={field.name}
+                    onChange={(event) => {
+                      const files = event.target.files
+                      if (!files) return
+
+                      const values = fileOpts?.multiple ? files : files[0]
+                      field.onChange(values)
+                    }}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          )
+        }
+
         return (
           <Controller
             key={name}

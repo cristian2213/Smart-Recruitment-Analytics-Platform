@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { type TRole, type User } from '@/types'
 import { ColumnDef } from '@tanstack/react-table'
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { RowActions } from './row-actions'
 
 const columns: ColumnDef<User>[] = [
@@ -31,6 +32,19 @@ const columns: ColumnDef<User>[] = [
         <Badge variant="highlight" className="text-xs">
           {role}
         </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: 'avatar',
+    header: 'Avatar',
+    cell: ({ row }) => {
+      const avatar = row.getValue('avatar') as string | undefined
+      return (
+        <Avatar>
+          <AvatarImage src={avatar} alt="avatar" className="cursor-pointer" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
       )
     },
   },
@@ -75,7 +89,10 @@ const columns: ColumnDef<User>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: (data) => <RowActions {...data} />,
+    cell: (data) => {
+      data.row.original.avatar = undefined
+      return <RowActions {...data} />
+    },
   },
 ]
 

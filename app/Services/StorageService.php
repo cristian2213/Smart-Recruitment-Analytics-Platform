@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\FilesystemException;
 use RuntimeException;
 
 class StorageService
@@ -27,6 +27,14 @@ class StorageService
         'public.media',
     ];
 
+    public function get_full_path(string $relative_path): string
+    {
+        $storage_url = config('filesystems.disks.s3.endpoint');
+        $bucket_name = config('filesystems.disks.s3.bucket');
+
+        return implode('/', [$storage_url, $bucket_name, $relative_path]);
+    }
+
     /**
      * Upload a file to S3 using streaming to handle large files efficiently.
      *
@@ -35,9 +43,6 @@ class StorageService
      * @param  string|null  $disk  The storage disk to use (defaults to 's3')
      * @param  array  $options  Additional options for S3 (e.g., ACL, ContentType)
      * @return string|false The file path if successful, false on failure
-     *
-     * @throws RuntimeException When stream cannot be opened
-     * @throws FilesystemException When S3 operations fail
      */
     public function uploadToS3(
         UploadedFile $file,
@@ -66,8 +71,12 @@ class StorageService
                 fclose($stream);
             }
 
-            return $success ? $path : false;
-        } catch (\Exception $e) {
+            if (! $success) {
+                return false;
+            }
+
+            return $this->get_full_path($path);
+        } catch (Exception $e) {
             // Clean up on error
             if (isset($stream) && is_resource($stream)) {
                 fclose($stream);
@@ -84,10 +93,9 @@ class StorageService
      * @param  string|null  $disk  The storage disk to use (defaults to 's3')
      * @return resource|false The file stream if successful, false on failure
      *
-     * @throws FilesystemException When S3 operations fail
      * @throws RuntimeException When the file doesn't exist or cannot be read
      */
-    public function downloadFromS3(string $path, ?string $disk = 's3')
+    public function download_from_s3(string $path, ?string $disk = 's3')
     {
         try {
             // Check if file exists
@@ -102,13 +110,65 @@ class StorageService
             }
 
             return $stream;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Clean up on error
             if (isset($stream) && is_resource($stream)) {
                 fclose($stream);
             }
 
             throw $e;
+        }
+    }
+
+    /**
+     * Check if a file exists in the S3 bucket
+     *
+     * @param  string  $path  The file path in S3
+     * @param  string|null  $disk  The storage disk to use (defaults to 's3')
+     * @return bool True if the file exists, false otherwise
+     *
+    //  * @throws Exception When S3 operations fail
+     */
+    public function file_exists_in_S3(string $path, ?string $disk = 's3'): bool
+    {
+        try {
+            return Storage::disk($disk)->exists($path);
+        } catch (Exception $e) {
+            return false;
+            // throw new Exception("Failed to check file existence: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Safely delete a file from S3 if it exists
+     *
+     * @param  string  $path  The file path in S3
+     * @param  string|null  $disk  The storage disk to use (defaults to 's3')
+     * @return bool True if the file was deleted or didn't exist, false if deletion failed
+     *
+    //  * @throws Exception When S3 operations fail
+     */
+    public function delete_from_s3(string $path, ?string $disk = 's3'): bool
+    {
+        try {
+            // Check if file exists before attempting deletion
+            if (! $this->file_exists_in_S3($path, $disk)) {
+                return false;
+                // throw new Exception("Failed to check file existence: {$path}");
+            }
+
+            // Attempt to delete the file
+            $deleted = Storage::disk($disk)->delete($path);
+
+            if (! $deleted) {
+                return false;
+                // throw new Exception("Failed to delete file: {$path}");
+            }
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+            // throw new Exception("Error deleting file: {$e->getMessage()}");
         }
     }
 

@@ -32,25 +32,25 @@ const editionModal = {
 function RowActions(props: CellContext<User, unknown>) {
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false)
   const [isCreateFormOpen, setCreateForm] = useState<boolean>(false)
-  const { row } = props
-  const id = row.original.uuid
+  const {
+    row: { original },
+  } = props
+  const id = original.uuid
 
-  const onOpenConfAlert = () => {
+  const handleOpenConfAlert = () => {
     setIsAlertOpen((preVal) => {
       const newVal = !preVal
       return newVal
     })
   }
 
-  const onEdit = () => setCreateForm(true)
-
-  const onCopyID = () => {
+  const handleCopyID = () => {
     navigator.clipboard.writeText(id).then(() => {
       toast.success('Record ID copied to clipboard')
     })
   }
 
-  const onHttpDelete = () => {
+  const handleHttpDelete = () => {
     const url = addSubPathToUrl(getUrl(), id)
     router.delete(url, {
       onSuccess: (res) => {
@@ -62,13 +62,17 @@ function RowActions(props: CellContext<User, unknown>) {
     })
   }
 
-  const onHttpEdit = (
+  const handleEdit = () => setCreateForm(true)
+
+  const handleHttpEdit = (
     data: z.infer<typeof updateUserValidation>,
     form: UseFormReturn,
   ) => {
     const payload = deleteEmptyProps(data)
     const url = addSubPathToUrl(getUrl(), id)
-    router.put(url, payload as RequestPayload, {
+    payload['_method'] = 'put' // // Form Method Spoofing
+
+    router.post(url, payload as RequestPayload, {
       onSuccess: (res) => {
         handleHttpSuccess(res)
         setCreateForm(false)
@@ -94,8 +98,8 @@ function RowActions(props: CellContext<User, unknown>) {
         <DynamicForm
           inputs={updateFormInputs}
           schema={updateUserValidation}
-          defaultValues={row.original}
-          onSubmit={onHttpEdit}
+          defaultValues={original}
+          onSubmit={handleHttpEdit}
         />
       </Modal>
 
@@ -103,9 +107,9 @@ function RowActions(props: CellContext<User, unknown>) {
         title="Confirm Deletion"
         description="Are you sure you want to delete this record?"
         isOpen={isAlertOpen}
-        onOpen={onOpenConfAlert}
-        onConfirm={onHttpDelete}
-        onCancel={onOpenConfAlert}
+        onOpen={handleOpenConfAlert}
+        onConfirm={handleHttpDelete}
+        onCancel={handleOpenConfAlert}
       />
 
       <DropdownMenu>
@@ -117,9 +121,9 @@ function RowActions(props: CellContext<User, unknown>) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-          <DropdownMenuItem onClick={onOpenConfAlert}>Delete</DropdownMenuItem>
-          <DropdownMenuItem onClick={onCopyID}>Copy ID</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleOpenConfAlert}>Delete</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleCopyID}>Copy ID</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             More <Ellipsis />

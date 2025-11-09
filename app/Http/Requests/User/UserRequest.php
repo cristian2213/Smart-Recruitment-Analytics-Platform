@@ -22,6 +22,9 @@ class UserRequest extends FormRequest
             'email' => [
                 'nullable', 'string', 'email', 'max:255',
             ],
+            'avatar' => [
+                'nullable', 'image', 'mimes:png,jpg,jpeg', 'max:1024',
+            ],
             'password' => [
                 'nullable', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised(),
             ],

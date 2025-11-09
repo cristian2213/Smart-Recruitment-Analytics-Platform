@@ -33,7 +33,7 @@ services:
     # File Storage
     minio:
         image: minio/minio
-        container_name: minio-storage
+        container_name: s3-storage
         env_file:
             - ./.env
         environment:
@@ -43,6 +43,7 @@ services:
             MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
         volumes:
             - minio-data:/data
+            - ./scripts/minio-setup.sh:/minio-setup.sh
         ports:
             #  Connection to "S3"
             - "9000:9000"
