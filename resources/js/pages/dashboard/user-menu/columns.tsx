@@ -1,9 +1,49 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
 import { type TRole, type User } from '@/types'
 import { ColumnDef } from '@tanstack/react-table'
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useState } from 'react'
 import { RowActions } from './row-actions'
+
+function AvatarCell({ avatarUrl }: { avatarUrl?: string }) {
+  const [showImageDialog, setShowImageDialog] = useState(false)
+
+  const handleModal = () => {
+    if (avatarUrl) setShowImageDialog(true)
+  }
+
+  return (
+    <>
+      <Avatar
+        onClick={handleModal}
+        className={cn(
+          'transition-opacity hover:opacity-80',
+          avatarUrl ? 'cursor-pointer' : '',
+        )}
+      >
+        <AvatarImage src={avatarUrl} alt="avatar" />
+        <AvatarFallback>CN</AvatarFallback>
+      </Avatar>
+
+      <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
+        <DialogContent className="max-w-2xl" aria-describedby="">
+          <DialogHeader>
+            <DialogTitle>User Avatar</DialogTitle>
+          </DialogHeader>
+          <div className="relative aspect-square overflow-hidden rounded-lg">
+            <img
+              src={avatarUrl}
+              alt="User avatar"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
 
 const columns: ColumnDef<User>[] = [
   {
@@ -40,12 +80,7 @@ const columns: ColumnDef<User>[] = [
     header: 'Avatar',
     cell: ({ row }) => {
       const avatar = row.getValue('avatar') as string | undefined
-      return (
-        <Avatar>
-          <AvatarImage src={avatar} alt="avatar" className="cursor-pointer" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-      )
+      return <AvatarCell avatarUrl={avatar} />
     },
   },
   {
