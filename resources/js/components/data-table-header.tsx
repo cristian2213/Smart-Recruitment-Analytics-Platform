@@ -213,12 +213,25 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
     dispatch({ type: 'TOGGLE_MODAL', modal: 'downloadRecords' })
 
   const handleHttpDownload = ({ from, to }: { from: Date; to: Date }) => {
-    window.location.href = route('users.download', {
-      _query: {
+    router.get(
+      route('users.download'),
+      {
         from: format(from, 'yyyy-MM-dd'),
         to: format(to, 'yyyy-MM-dd'),
       },
-    })
+      {
+        preserveState: true,
+        replace: true,
+        onSuccess: (res) => {
+          console.log('handleHttpDownload-Res', res)
+          handleHttpSuccess(res)
+        },
+        onError: (errors) => {
+          console.log('handleHttpDownload-Error', errors)
+          handleHttpErrors(errors)
+        },
+      },
+    )
   }
 
   return (

@@ -336,8 +336,10 @@ class UserController extends Controller
 
         $file_name = 'users-'.$from.'_'.$to.'.xlsx';
 
-        return (new UsersExport($from, $to))->download(
-            $file_name,
+        (new UsersExport($from, $to))->store(
+            'public/'.$file_name,
         );
+
+        return back()->with('message', 'Export started!');
     }
 }

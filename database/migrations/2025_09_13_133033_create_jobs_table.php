@@ -22,7 +22,8 @@ return new class extends Migration
             $table->json('skills');
             $table->string('salary', 24)->nullable();
             $table->enum('status', JobStatus::cases())->default(JobStatus::Draft);
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletes();
             $table->foreignId('user_id')->constrained('users')->noActionOnDelete();
             $table->foreignId('recruiter_id')->constrained('users')->noActionOnDelete();
         });
@@ -32,7 +33,8 @@ return new class extends Migration
             $table->uuid('uuid')->index();
             $table->float('match_score')->default(0);
             $table->enum('status', ApplicationStatus::cases())->default(ApplicationStatus::Pending);
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletes();
             $table->foreignId('user_id')->constrained('users')->noActionOnDelete();
             $table->foreignId('employment_id')->constrained('employments')->noActionOnDelete();
         });
@@ -44,7 +46,8 @@ return new class extends Migration
             $table->time('end_time');
             $table->string('link');
             $table->enum('was_confirmed', InterviewStatus::cases())->default(InterviewStatus::No);
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletes();
             $table->foreignId('application_id')->constrained('applications')->noActionOnDelete();
         });
     }

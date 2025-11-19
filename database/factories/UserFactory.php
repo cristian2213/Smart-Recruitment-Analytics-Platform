@@ -47,7 +47,6 @@ class UserFactory extends Factory
         ]);
     }
 
-    // function to adminRole, hrManagerRole, recruiterRole, applicantRole
     public function adminRole(): static
     {
         $adminRole = Role::where('role', RoleEnum::Admin)->first();

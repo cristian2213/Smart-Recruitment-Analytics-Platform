@@ -79,11 +79,24 @@ export interface User {
   uuid: string
   name: string
   email: string
-  avatar?: string | File
+  // avatar?: string | File
+  avatar?: string
   email_verified_at: string | null
   roles: Role[]
   role: string
   [key: string]: unknown // This allows for additional properties...
+}
+
+export interface Job {
+  id: number
+  title: string
+  location: string
+  salary: string
+  status: string
+  creator: Pick<User, 'id' | 'name'>
+  recruiter: Pick<User, 'id' | 'name'>
+  created_at: string
+  updated_at: string
 }
 
 export interface Permission {
