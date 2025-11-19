@@ -1,6 +1,6 @@
-import { DataTable } from '@/components/data-table'
-import { DataTableHeader } from '@/components/data-table-header'
-import { DataTablePagination } from '@/components/data-table-pagination'
+import { DataTable } from '@/components/datatable/data-table'
+import { DataTableHeader } from '@/components/datatable/data-table-header'
+import { DataTablePagination } from '@/components/datatable/data-table-pagination'
 import AppLayout from '@/layouts/app-layout'
 import {
   Job,
@@ -28,11 +28,10 @@ const tableHeaderActions: HeaderActions<typeof createJobValidation> = {
       userFormInputs: createFormInputs,
       schema: createJobValidation,
       defaultValues: {
-        name: 'test',
-        last_name: 'test 2',
-        email: `test${Math.round(Math.random() * 1000)}@gmail.com`,
-        password: 'admin123@A#',
-        role: 'hr_manager',
+        title: 'Software Engineer',
+        location: 'Remote',
+        salary: '120000',
+        status: 'draft',
       },
     },
   },
@@ -49,9 +48,7 @@ export default function Jobs({ jobs }: JobsProps) {
   const tableData: TableData<Job> = useMemo(
     () => ({
       columns,
-      data: jobs.data.map((job) => {
-        return job
-      }),
+      data: jobs.data,
       links: jobs.links,
     }),
     [jobs.data, jobs.links],

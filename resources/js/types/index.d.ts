@@ -93,8 +93,8 @@ export interface Job {
   location: string
   salary: string
   status: string
-  creator: Pick<User, 'id' | 'name'>
-  recruiter: Pick<User, 'id' | 'name'>
+  creator: Pick<User, 'id' | 'name' | 'avatar'>
+  recruiter: Pick<User, 'id' | 'name' | 'avatar'>
   created_at: string
   updated_at: string
 }
@@ -102,13 +102,6 @@ export interface Job {
 export interface Permission {
   id: number
   name: string
-}
-
-export interface Job {
-  id: number
-  title: string
-  created_at: string
-  updated_at: string
 }
 
 export interface Link {

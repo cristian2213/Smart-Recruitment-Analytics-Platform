@@ -13,6 +13,7 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar'
 import { DEBOUNCE_DELAY } from '@/constans/delays'
+import { useModal } from '@/hooks/useModal'
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
 import { toIsoWithOffset } from '@/lib/time'
 import { getQueryParam, getUrl } from '@/lib/url'
@@ -20,13 +21,13 @@ import { type HeaderActions, type RequestPayload } from '@/types'
 import { router, useForm } from '@inertiajs/react'
 import { Table as ITable } from '@tanstack/react-table'
 import { format } from 'date-fns'
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { type UseFormReturn } from 'react-hook-form'
 import * as z from 'zod'
-import { Modal } from './modal'
-import { RangePicker } from './range-picker'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
+import { Modal } from '../modal'
+import { RangePicker } from '../range-picker'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
 
 const creationModal = {
   title: 'Create a new Record',
@@ -116,33 +117,6 @@ export function SearchEngine() {
   )
 }
 
-type ModalType = 'downloadRecords' | 'createRecord'
-type ModalState = {
-  [key in ModalType]: boolean
-}
-type Action =
-  | { type: 'OPEN_MODAL'; modal: ModalType }
-  | { type: 'CLOSE_MODAL'; modal: ModalType }
-  | { type: 'TOGGLE_MODAL'; modal: ModalType }
-  | { type: 'CLOSE_ALL' }
-function modalReducer(state: ModalState, action: Action): ModalState {
-  switch (action.type) {
-    case 'OPEN_MODAL':
-      return { ...state, [action.modal]: true }
-    case 'CLOSE_MODAL':
-      return { ...state, [action.modal]: false }
-    case 'TOGGLE_MODAL':
-      return { ...state, [action.modal]: !state[action.modal] }
-    case 'CLOSE_ALL':
-      return Object.keys(state).reduce(
-        (acc, key) => ({ ...acc, [key]: false }),
-        {} as ModalState,
-      )
-    default:
-      return state
-  }
-}
-
 interface DataTableHeaderProps<TData, TFormSchema extends z.ZodType> {
   table: ITable<TData>
   headerActions: HeaderActions<TFormSchema>
@@ -156,9 +130,12 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
   const [formDefValues, setFormDefValues] = useState<z.infer<TFormSchema>>(
     actions.create.defaultValues as z.infer<TFormSchema>,
   )
-  const [state, dispatch] = useReducer(modalReducer, {
-    downloadRecords: false,
-    createRecord: false,
+
+  const { state, dispatch } = useModal<'downloadRecords' | 'createRecord'>({
+    initialState: {
+      downloadRecords: false,
+      createRecord: false,
+    },
   })
 
   const getVisibleColumns = () => {

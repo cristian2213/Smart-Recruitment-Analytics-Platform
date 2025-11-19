@@ -1,12 +1,11 @@
 import { AvatarCell } from '@/components/avatar-cell'
+import { RowActions } from '@/components/datatable/row-actions'
 import { Badge } from '@/components/ui/badge'
+import { titleShortener } from '@/lib/str'
+import { updateFormInputs, updateJobValidation } from '@/pages/dashboard/job-menu/forms'
 import { User, type Job } from '@/types'
 import { ColumnDef } from '@tanstack/react-table'
 import { format } from 'date-fns'
-
-function RowActions() {
-  return <div>Actions</div>
-}
 
 const columns: ColumnDef<Job>[] = [
   {
@@ -16,6 +15,10 @@ const columns: ColumnDef<Job>[] = [
   {
     accessorKey: 'title',
     header: 'Title',
+    cell: ({ row }) => {
+      const title = row.getValue('title') as string
+      return <span className="text-xs">{titleShortener(title, 20)}</span>
+    },
   },
   {
     accessorKey: 'salary',
@@ -64,16 +67,13 @@ const columns: ColumnDef<Job>[] = [
     header: 'Dates',
     cell: ({ row }) => {
       const { created_at, updated_at } = row.original
-      let dates: string
+      let dates = 'N/A'
 
-      console.log('dates', created_at, updated_at)
       if (created_at && updated_at) {
         dates =
           format(new Date(created_at), 'yyyy-MM-dd') +
           ' - ' +
           format(new Date(updated_at), 'yyyy-MM-dd')
-      } else {
-        dates = 'N/A'
       }
 
       return (
@@ -87,7 +87,13 @@ const columns: ColumnDef<Job>[] = [
     id: 'actions',
     header: 'Actions',
     cell: (data) => {
-      return <RowActions />
+      return (
+        <RowActions<Job>
+          cell={data}
+          updateFormInputs={updateFormInputs}
+          rowUpdateValidation={updateJobValidation}
+        />
+      )
     },
   },
 ]

@@ -13,7 +13,7 @@ import {
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
 import { addSubPathToUrl, getUrl } from '@/lib/url'
 import { deleteEmptyProps } from '@/lib/utils'
-import { RequestPayload, User } from '@/types'
+import { DynamicFormInputProps, RequestPayload } from '@/types'
 import { router } from '@inertiajs/react'
 import { type CellContext } from '@tanstack/react-table'
 import { Ellipsis, MoreHorizontal } from 'lucide-react'
@@ -21,7 +21,6 @@ import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
-import { updateFormInputs, updateUserValidation } from './forms'
 
 const editionModal = {
   title: 'Edit Record',
@@ -29,13 +28,21 @@ const editionModal = {
   done: 'Edit',
 }
 
-function RowActions(props: CellContext<User, unknown>) {
+type RecordIds = { id: number; uuid?: string }
+
+interface RowActionsProps<TData> {
+  cell: CellContext<TData, unknown>
+  updateFormInputs: DynamicFormInputProps[]
+  rowUpdateValidation: z.ZodObject
+}
+
+function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false)
   const [isCreateFormOpen, setCreateForm] = useState<boolean>(false)
   const {
     row: { original },
-  } = props
-  const id = original.uuid
+  } = props.cell
+  const id = original.uuid || original.id.toString()
 
   const handleOpenConfAlert = () => {
     setIsAlertOpen((preVal) => {
@@ -65,12 +72,12 @@ function RowActions(props: CellContext<User, unknown>) {
   const handleEdit = () => setCreateForm(true)
 
   const handleHttpEdit = (
-    data: z.infer<typeof updateUserValidation>,
+    data: z.infer<typeof props.rowUpdateValidation>,
     form: UseFormReturn,
   ) => {
     const payload = deleteEmptyProps(data)
     const url = addSubPathToUrl(getUrl(), id)
-    payload['_method'] = 'put' // // Form Method Spoofing
+    payload['_method'] = 'put'
 
     router.post(url, payload as RequestPayload, {
       onSuccess: (res) => {
@@ -96,8 +103,8 @@ function RowActions(props: CellContext<User, unknown>) {
         onOpenChange={setCreateForm}
       >
         <DynamicForm
-          inputs={updateFormInputs}
-          schema={updateUserValidation}
+          inputs={props.updateFormInputs}
+          schema={props.rowUpdateValidation}
           defaultValues={original}
           onSubmit={handleHttpEdit}
         />

@@ -1,8 +1,9 @@
 import { AvatarCell } from '@/components/avatar-cell'
+import { RowActions } from '@/components/datatable/row-actions'
 import { Badge } from '@/components/ui/badge'
 import { type TRole, type User } from '@/types'
 import { ColumnDef } from '@tanstack/react-table'
-import { RowActions } from './row-actions'
+import { updateFormInputs, updateUserValidation } from './forms'
 
 const columns: ColumnDef<User>[] = [
   {
@@ -86,7 +87,13 @@ const columns: ColumnDef<User>[] = [
     header: 'Actions',
     cell: (data) => {
       data.row.original.avatar = undefined
-      return <RowActions {...data} />
+      return (
+        <RowActions
+          cell={data}
+          updateFormInputs={updateFormInputs}
+          rowUpdateValidation={updateUserValidation}
+        />
+      )
     },
   },
 ]
