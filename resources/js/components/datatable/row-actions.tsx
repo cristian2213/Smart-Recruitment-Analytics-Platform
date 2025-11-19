@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useModal } from '@/hooks/useModal'
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
 import { addSubPathToUrl, getUrl } from '@/lib/url'
 import { deleteEmptyProps } from '@/lib/utils'
@@ -17,7 +18,6 @@ import { DynamicFormInputProps, RequestPayload } from '@/types'
 import { router } from '@inertiajs/react'
 import { type CellContext } from '@tanstack/react-table'
 import { Ellipsis, MoreHorizontal } from 'lucide-react'
-import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -37,25 +37,24 @@ interface RowActionsProps<TData> {
 }
 
 function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
-  const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false)
-  const [isCreateFormOpen, setCreateForm] = useState<boolean>(false)
   const {
     row: { original },
   } = props.cell
   const id = original.uuid || original.id.toString()
 
-  const handleOpenConfAlert = () => {
-    setIsAlertOpen((preVal) => {
-      const newVal = !preVal
-      return newVal
-    })
-  }
+  const { state, dispatch } = useModal<'updateRecord' | 'deleteRecord'>({
+    initialState: {
+      updateRecord: false,
+      deleteRecord: false,
+    },
+  })
 
-  const handleCopyID = () => {
+  const handleAlertConf = () => dispatch({ type: 'TOGGLE_MODAL', modal: 'deleteRecord' })
+
+  const handleCopyID = () =>
     navigator.clipboard.writeText(id).then(() => {
       toast.success('Record ID copied to clipboard')
     })
-  }
 
   const handleHttpDelete = () => {
     const url = addSubPathToUrl(getUrl(), id)
@@ -69,7 +68,7 @@ function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
     })
   }
 
-  const handleEdit = () => setCreateForm(true)
+  const handleEdit = () => dispatch({ type: 'TOGGLE_MODAL', modal: 'updateRecord' })
 
   const handleHttpEdit = (
     data: z.infer<typeof props.rowUpdateValidation>,
@@ -82,7 +81,7 @@ function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
     router.post(url, payload as RequestPayload, {
       onSuccess: (res) => {
         handleHttpSuccess(res)
-        setCreateForm(false)
+        handleEdit()
       },
       onError: (errors) => {
         handleHttpErrors(errors, (key, error) =>
@@ -98,9 +97,9 @@ function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
     <>
       <Modal
         text={editionModal}
-        isOpen={isCreateFormOpen}
+        isOpen={state.updateRecord}
         isEdit={true}
-        onOpenChange={setCreateForm}
+        onOpenChange={handleEdit}
       >
         <DynamicForm
           inputs={props.updateFormInputs}
@@ -113,10 +112,10 @@ function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
       <ConfirmationAlert
         title="Confirm Deletion"
         description="Are you sure you want to delete this record?"
-        isOpen={isAlertOpen}
-        onOpen={handleOpenConfAlert}
+        isOpen={state.deleteRecord}
+        onOpen={handleAlertConf}
         onConfirm={handleHttpDelete}
-        onCancel={handleOpenConfAlert}
+        onCancel={handleAlertConf}
       />
 
       <DropdownMenu>
@@ -129,7 +128,7 @@ function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
-          <DropdownMenuItem onClick={handleOpenConfAlert}>Delete</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleAlertConf}>Delete</DropdownMenuItem>
           <DropdownMenuItem onClick={handleCopyID}>Copy ID</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
