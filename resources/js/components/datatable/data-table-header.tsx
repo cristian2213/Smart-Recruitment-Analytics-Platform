@@ -169,14 +169,12 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
     router.post(getUrl().pathname, payload as RequestPayload, {
       preserveState: true,
       onSuccess: (res) => {
-        console.log('handleCreateModal-Res', res)
         handleHttpSuccess(res)
         form.reset()
         handleCreateModal()
         setFormDefValues(actions.create.defaultValues)
       },
       onError: (errors) => {
-        console.log('handleCreateModal-onError', errors)
         handleHttpErrors(errors, (key, error) =>
           form.setError(key, {
             message: error,
@@ -200,11 +198,9 @@ function DataTableHeader<TData, TFormSchema extends z.ZodType>({
         preserveState: true,
         replace: true,
         onSuccess: (res) => {
-          console.log('handleHttpDownload-Res', res)
           handleHttpSuccess(res)
         },
         onError: (errors) => {
-          console.log('handleHttpDownload-Error', errors)
           handleHttpErrors(errors)
         },
       },

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Enums\User\PermissionEnum;
 use App\Enums\User\RoleEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Job\JobRequest;
 use App\Models\Job;
 use App\Models\User;
 use App\Traits\UserAccessTrait;
@@ -92,7 +93,51 @@ class JobController extends Controller
      */
     public function create()
     {
-        //
+        $is_admin = $this->isAdmin();
+        $is_hr_manager = $this->isHRManager();
+
+        if (! $is_admin && ! $is_hr_manager) {
+            abort(403, 'You are not authorized to create a job');
+        }
+
+        if ($is_admin) {
+            $this->userCanOrFail(PermissionEnum::CreateJobs);
+
+            $recruiters = User::query()
+                ->select('users.id', 'users.name', 'users.last_name')
+                ->join('users_roles', function (JoinClause $join) {
+                    $join->on('users.id', '=', 'users_roles.user_id');
+                })
+                ->join('roles', function (JoinClause $join) {
+                    $join->on('users_roles.role_id', '=', 'roles.id');
+                })
+                ->where('roles.role', RoleEnum::Recruiter->value)
+                ->get();
+        }
+
+        if ($is_hr_manager) {
+            $this->userCanOrFail(PermissionEnum::CreateOwnJobs);
+
+            $recruiters = User::query()
+                ->select('users.id', 'users.name', 'users.last_name')
+                ->join('users_roles', function (JoinClause $join) {
+                    $join->on('users.id', '=', 'users_roles.user_id');
+                })
+                ->join('roles', function (JoinClause $join) {
+                    $join->on('users_roles.role_id', '=', 'roles.id');
+                })
+                ->where('roles.role', RoleEnum::Recruiter->value)
+                ->where('users.created_by', $this->userId())
+                ->get();
+        }
+
+        return Inertia::render('dashboard/job-menu/job', [
+            'edit' => false,
+            'job' => null,
+            'formOptions' => [
+                'recruiters' => $recruiters,
+            ],
+        ]);
     }
 
     /**
@@ -100,7 +145,29 @@ class JobController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $is_admin = $this->isAdmin();
+        $is_hr_manager = $this->isHRManager();
+
+        if (! $is_admin && ! $is_hr_manager) {
+            abort(403, 'You are not authorized to edit this job');
+        }
+
+        $validated = $request->validated();
+
+        if ($is_admin) {
+            $this->userCanOrFail(PermissionEnum::CreateJobs);
+            $job = Job::create($validated);
+        }
+
+        if ($is_hr_manager) {
+            $this->userCanOrFail(PermissionEnum::CreateOwnJobs);
+            $job = Job::create([
+                ...$validated,
+                'user_id' => $this->userId(),
+            ]);
+        }
+
+        return redirect()->route('dashboard.job.edit', $job->id)->with('message', 'Job created successfully');
     }
 
     /**
@@ -168,12 +235,42 @@ class JobController extends Controller
         ]);
     }
 
+    // NOTE: WORKING ON IT
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(JobRequest $request, string $id)
     {
-        //
+        $is_admin = $this->isAdmin();
+        $is_hr_manager = $this->isHRManager();
+
+        if (! $is_admin && ! $is_hr_manager) {
+            abort(403, 'You are not authorized to edit this job');
+        }
+
+        $validated = $request->validated();
+
+        if ($is_admin) {
+            $this->userCanOrFail(PermissionEnum::UpdateJobs);
+            $job = Job::findOrFail($id);
+        }
+
+        if ($is_hr_manager) {
+            $this->userCanOrFail(PermissionEnum::UpdateOwnJobs);
+            $job = Job::where('user_id', $this->userId())
+                ->findOrFail($id);
+        }
+
+        if (isset($validated['recruiter_id'])) {
+            if ($job->recruiter_id != $validated['recruiter_id']) {
+                $new_recruiter = User::findOrFail($validated['recruiter_id']);
+                $validated['recruiter_id'] = $new_recruiter->id;
+            }
+        }
+
+        $job->update($validated);
+
+        return back()->with('message', 'Job updated successfully');
     }
 
     /**

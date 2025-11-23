@@ -14,7 +14,7 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $httpVerb = request()->getMethod();
+        $httpVerb = $this->method();
 
         $rules = [
             'name' => ['nullable', 'string', 'max:100'],

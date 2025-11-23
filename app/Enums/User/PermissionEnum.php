@@ -20,6 +20,7 @@ enum PermissionEnum: string
 
     case ViewJobs = 'view_jobs'; // view
     case CreateJobs = 'create_jobs'; // actions 👇
+    case CreateOwnJobs = 'create_own_jobs';
     case ReadJobs = 'read_jobs';
     case ReadOwnJobs = 'read_own_jobs';
     case UpdateJobs = 'update_jobs';

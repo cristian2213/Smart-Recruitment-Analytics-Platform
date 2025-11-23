@@ -95,14 +95,20 @@ export interface Job {
   location: string
   salary: string
   status: JobStatus
+  skills: string
   creator: Pick<User, 'id' | 'name' | 'avatar'>
   recruiter: Pick<User, 'id' | 'name' | 'avatar'>
+  placement: string
   created_at: string
   updated_at: string
   deleted_at: string | null
 }
 
-export interface JobFormOptions extends Omit<Job, 'recruiter' | 'creator'> {
+export interface JobFormOptions
+  extends Omit<
+    Job,
+    'recruiter' | 'creator' | 'created_at' | 'updated_at' | 'deleted_at'
+  > {
   recruiter_id: Pick<User, 'id'>
 }
 

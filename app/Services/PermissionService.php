@@ -36,7 +36,7 @@ class PermissionService
             PermissionEnum::DownloadOwnUsers,
 
             PermissionEnum::ViewJobs,
-            PermissionEnum::CreateJobs,
+            PermissionEnum::CreateOwnJobs,
             PermissionEnum::ReadOwnJobs,
             PermissionEnum::UpdateOwnJobs,
             PermissionEnum::DeleteOwnJobs,

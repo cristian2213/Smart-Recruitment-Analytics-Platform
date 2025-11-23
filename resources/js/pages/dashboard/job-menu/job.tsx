@@ -10,8 +10,9 @@ import {
 } from '@/components/ui/card'
 import Editor from '@/components/ui/editor'
 import AppLayout from '@/layouts/app-layout'
+import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
 import { type BreadcrumbItem, type JobFormOptions, type User } from '@/types'
-import { Head } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import { useMemo, useState } from 'react'
 import {
   updateFormInputs as jobInputs,
@@ -66,7 +67,47 @@ export default function Job({ job, edit, formOptions }: JobProps) {
   }, [formOptions.recruiters])
 
   const handleSubmit = (data: JobFormOptions) => {
-    console.log(data)
+    const payload: Partial<JobFormOptions> = {
+      title: data.title,
+      skills: data.skills,
+      location: data.location,
+      salary: data.salary,
+      status: data.status,
+      placement: data.placement,
+      recruiter_id: data.recruiter_id,
+      description,
+    }
+
+    if (edit) {
+      payload.id = job.id
+
+      if (JSON.stringify(description) === JSON.stringify(job.description)) {
+        delete payload.description
+      }
+
+      router.put(route('dashboard.jobs.update', job.id), payload, {
+        preserveState: true,
+        replace: true,
+        onSuccess: (res) => {
+          handleHttpSuccess(res)
+        },
+        onError: (errors) => {
+          handleHttpErrors(errors)
+        },
+      })
+      return
+    }
+
+    router.post(route('dashboard.jobs.store'), payload, {
+      preserveState: true,
+      replace: true,
+      onSuccess: (res) => {
+        handleHttpSuccess(res)
+      },
+      onError: (errors) => {
+        handleHttpErrors(errors)
+      },
+    })
   }
 
   return (
