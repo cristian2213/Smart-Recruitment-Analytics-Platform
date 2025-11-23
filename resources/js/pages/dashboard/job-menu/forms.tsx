@@ -4,15 +4,16 @@ import * as z from 'zod'
 
 const statusEnum = z.enum(['draft', 'published', 'closed'])
 
-// Create Job Schema (full fields required for creation)
 const createJobValidation = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters.'),
   location: z.string().min(2, 'Location must be at least 2 characters.'),
+  skills: z.string().min(1, 'Skills is required.'),
   salary: z.string().min(1, 'Salary is required.'),
   status: statusEnum,
+  placement: z.string().min(1, 'Placement is required.'),
+  recruiter_id: z.string().min(1, 'Recruiter is required.'),
 })
 
-// Update Job Schema (partial; allow editing any subset)
 const updateJobValidation = createJobValidation.partial()
 
 const createFormInputs: DynamicFormInputProps[] = [
@@ -64,11 +65,11 @@ const createFormInputs: DynamicFormInputProps[] = [
     type: 'text',
   },
   {
-    name: 'recruiter',
+    name: 'recruiter_id',
     label: 'Recruiter',
-    placeholder: 'Enter recruiter',
-    htmlElement: 'input',
-    type: 'text',
+    placeholder: 'Select recruiter',
+    htmlElement: 'select',
+    options: [],
   },
 ]
 

@@ -13,7 +13,7 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar'
 import { DEBOUNCE_DELAY } from '@/constans/delays'
-import { useModal } from '@/hooks/useModal'
+import { useModal } from '@/hooks/use-modal'
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
 import { toIsoWithOffset } from '@/lib/time'
 import { getQueryParam, getUrl } from '@/lib/url'

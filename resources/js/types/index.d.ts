@@ -12,7 +12,7 @@ export type HTTPSuccessRes = {
 
 export type TRole = 'admin' | 'hr_manager' | 'recruiter' | 'applicant'
 
-// ***** START - INERTIA REQUEST PAYLOAD *****
+// INERTIA REQUEST PAYLOAD
 type FormDataConvertibleValue =
   | Blob
   | FormDataEntryValue
@@ -28,7 +28,6 @@ type FormDataConvertible =
     }
   | FormDataConvertibleValue
 export type RequestPayload = Record<string, FormDataConvertible> | FormData
-// ********************************************
 
 export interface InertiaProps {
   errors: { [key: string]: string }
@@ -87,17 +86,24 @@ export interface User {
   [key: string]: unknown // This allows for additional properties...
 }
 
+export type JobStatus = 'draft' | 'published' | 'closed'
+
 export interface Job {
   id: number
   title: string
   description: string | null
   location: string
   salary: string
-  status: string
+  status: JobStatus
   creator: Pick<User, 'id' | 'name' | 'avatar'>
   recruiter: Pick<User, 'id' | 'name' | 'avatar'>
   created_at: string
   updated_at: string
+  deleted_at: string | null
+}
+
+export interface JobFormOptions extends Omit<Job, 'recruiter' | 'creator'> {
+  recruiter_id: Pick<User, 'id'>
 }
 
 export interface Permission {
@@ -118,19 +124,16 @@ export interface FileOpts {
   name: string
 }
 
-// ***** START - DYNAMIC FORM INTERFACES *****
 export interface DynamicFormInputProps {
   name: string
   htmlElement: 'input' | 'textarea' | 'select'
-  type: 'text' | 'password' | 'email' | 'file'
+  type?: 'text' | 'password' | 'email' | 'file' | 'number'
   label: string
   placeholder?: string
   options?: { value: string; label: string }[]
   fileOpts?: FileOpts
 }
-// ********************************************
 
-// ***** START - DATA TABLE INTERFACES *****
 export interface TableData<TData> {
   columns: ColumnDef<TData>[]
   data: TData[]

@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useModal } from '@/hooks/useModal'
+import { useModal } from '@/hooks/use-modal'
 import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
 import { addSubPathToUrl, getUrl } from '@/lib/url'
 import { deleteEmptyProps } from '@/lib/utils'

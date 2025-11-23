@@ -6,8 +6,10 @@ use App\Enums\User\PermissionEnum;
 use App\Enums\User\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
+use App\Models\User;
 use App\Traits\UserAccessTrait;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -123,17 +125,46 @@ class JobController extends Controller
 
         if ($is_admin) {
             $this->userCanOrFail(PermissionEnum::UpdateJobs);
+
             $job = Job::findOrFail($id);
+
+            $recruiters = User::query()
+                ->select('users.id', 'users.name', 'users.last_name')
+                ->join('users_roles', function (JoinClause $join) {
+                    $join->on('users.id', '=', 'users_roles.user_id');
+                })
+                ->join('roles', function (JoinClause $join) {
+                    $join->on('users_roles.role_id', '=', 'roles.id');
+                })
+                ->where('roles.role', RoleEnum::Recruiter->value)
+                ->get();
         }
 
         if ($is_hr_manager) {
             $this->userCanOrFail(PermissionEnum::UpdateOwnJobs);
-            $job = Job::where('user_id', $this->userId())->findOrFail($id);
+
+            $job = Job::where('user_id', $this->userId())
+                ->findOrFail($id);
+
+            $recruiters = User::query()
+                ->select('users.id', 'users.name', 'users.last_name')
+                ->join('users_roles', function (JoinClause $join) {
+                    $join->on('users.id', '=', 'users_roles.user_id');
+                })
+                ->join('roles', function (JoinClause $join) {
+                    $join->on('users_roles.role_id', '=', 'roles.id');
+                })
+                ->where('roles.role', RoleEnum::Recruiter->value)
+                ->where('users.created_by', $this->userId())
+                ->get();
         }
 
         return Inertia::render('dashboard/job-menu/job', [
-            'job' => $job,
             'edit' => true,
+            'job' => $job,
+            'formOptions' => [
+                'recruiters' => $recruiters,
+            ],
         ]);
     }
 
