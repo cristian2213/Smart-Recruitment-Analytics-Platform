@@ -8,3 +8,9 @@ enum JobStatus: string
     case Published = 'published';
     case Closed = 'closed';
 }
+
+enum JobPlacement: string
+{
+    case Remote = 'remote';
+    case OnSite = 'onsite';
+}

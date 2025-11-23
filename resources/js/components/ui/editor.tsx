@@ -100,7 +100,7 @@ export default function Editor({ value, onChange, placeholder }: EditorProps) {
                     placeholder: placeholder,
                 }}
                 data={value}
-                onChange={(event, editor) => {
+                onChange={(_event, editor) => {
                     const data = editor.getData();
                     onChange(data);
                 }}

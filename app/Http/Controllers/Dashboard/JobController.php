@@ -133,6 +133,7 @@ class JobController extends Controller
 
         return Inertia::render('dashboard/job-menu/job', [
             'job' => $job,
+            'edit' => true,
         ]);
     }
 

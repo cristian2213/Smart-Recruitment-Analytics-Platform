@@ -29,6 +29,7 @@ interface FormDataProps<TFormSchema> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   schema: any
   defaultValues: z.infer<TFormSchema>
+  htmlProps?: React.HTMLAttributes<HTMLDivElement>
   onSubmit: (data: z.infer<TFormSchema>, form: UseFormReturn) => void
 }
 
@@ -38,6 +39,7 @@ function DynamicForm<TFormSchema extends z.ZodType<any>>({
   defaultValues,
   schema,
   onSubmit,
+  htmlProps = {},
 }: FormDataProps<TFormSchema>) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -186,7 +188,7 @@ function DynamicForm<TFormSchema extends z.ZodType<any>>({
 
   return (
     <form id="dynamic-form" onSubmit={form.handleSubmit(handleSubmit)}>
-      <FieldGroup className="gap-4">{createForm()}</FieldGroup>
+      <FieldGroup {...htmlProps}>{createForm()}</FieldGroup>
     </form>
   )
 }

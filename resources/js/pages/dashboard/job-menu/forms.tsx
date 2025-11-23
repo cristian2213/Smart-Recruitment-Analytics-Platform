@@ -31,6 +31,13 @@ const createFormInputs: DynamicFormInputProps[] = [
     type: 'text',
   },
   {
+    name: 'skills',
+    label: 'Skills',
+    placeholder: 'Enter skills',
+    htmlElement: 'input',
+    type: 'text',
+  },
+  {
     name: 'salary',
     label: 'Salary',
     placeholder: 'Enter salary',
@@ -48,6 +55,20 @@ const createFormInputs: DynamicFormInputProps[] = [
       { value: 'published', label: 'Published' },
       { value: 'closed', label: 'Closed' },
     ],
+  },
+  {
+    name: 'placement',
+    label: 'Placement',
+    placeholder: 'Enter placement',
+    htmlElement: 'input',
+    type: 'text',
+  },
+  {
+    name: 'recruiter',
+    label: 'Recruiter',
+    placeholder: 'Enter recruiter',
+    htmlElement: 'input',
+    type: 'text',
   },
 ]
 
