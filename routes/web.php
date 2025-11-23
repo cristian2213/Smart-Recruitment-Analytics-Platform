@@ -15,7 +15,7 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     })->name('dashboard');
 
     Route::resource('users', UserController::class)->names('dashboard.users')->except(['show', 'edit']);
-    Route::resource('jobs', JobController::class)->names('dashboard.jobs')->except(['show', 'edit']);
+    Route::resource('jobs', JobController::class)->names('dashboard.jobs');
 
     Route::get('users/download', [UserController::class, 'download_users'])->name('users.download');
 });

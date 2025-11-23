@@ -93,6 +93,12 @@ function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
     })
   }
 
+  const handleShow = () => {
+    const url = addSubPathToUrl(getUrl(), id + '/edit')
+    console.log(url)
+    router.get(url)
+  }
+
   return (
     <>
       <Modal
@@ -128,6 +134,7 @@ function RowActions<TData extends RecordIds>(props: RowActionsProps<TData>) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleShow}>Show</DropdownMenuItem>
           <DropdownMenuItem onClick={handleAlertConf}>Delete</DropdownMenuItem>
           <DropdownMenuItem onClick={handleCopyID}>Copy ID</DropdownMenuItem>
           <DropdownMenuSeparator />

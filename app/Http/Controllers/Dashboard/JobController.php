@@ -114,7 +114,26 @@ class JobController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $is_admin = $this->isAdmin();
+        $is_hr_manager = $this->isHRManager();
+
+        if (! $is_admin && ! $is_hr_manager) {
+            abort(403, 'You are not authorized to edit this job');
+        }
+
+        if ($is_admin) {
+            $this->userCanOrFail(PermissionEnum::UpdateJobs);
+            $job = Job::findOrFail($id);
+        }
+
+        if ($is_hr_manager) {
+            $this->userCanOrFail(PermissionEnum::UpdateOwnJobs);
+            $job = Job::where('user_id', $this->userId())->findOrFail($id);
+        }
+
+        return Inertia::render('dashboard/job-menu/job', [
+            'job' => $job,
+        ]);
     }
 
     /**

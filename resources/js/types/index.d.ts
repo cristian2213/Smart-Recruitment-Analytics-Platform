@@ -90,6 +90,7 @@ export interface User {
 export interface Job {
   id: number
   title: string
+  description: string | null
   location: string
   salary: string
   status: string
