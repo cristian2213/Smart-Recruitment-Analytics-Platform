@@ -194,6 +194,7 @@ class JobController extends Controller
             $this->userCanOrFail(PermissionEnum::UpdateJobs);
 
             $job = Job::findOrFail($id);
+            $job->skills = json_decode($job->skills);
 
             $recruiters = User::query()
                 ->select('users.id', 'users.name', 'users.last_name')
@@ -261,13 +262,6 @@ class JobController extends Controller
                 ->findOrFail($id);
         }
 
-        if (isset($validated['recruiter_id'])) {
-            if ($job->recruiter_id != $validated['recruiter_id']) {
-                $new_recruiter = User::findOrFail($validated['recruiter_id']);
-                $validated['recruiter_id'] = $new_recruiter->id;
-            }
-        }
-
         $job->update($validated);
 
         return back()->with('message', 'Job updated successfully');
@@ -278,6 +272,26 @@ class JobController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $is_admin = $this->isAdmin();
+        $is_hr_manager = $this->isHRManager();
+
+        if (! $is_admin && ! $is_hr_manager) {
+            abort(403, 'You are not authorized to delete this job');
+        }
+
+        if ($is_admin) {
+            $this->userCanOrFail(PermissionEnum::DeleteJobs);
+            $job = Job::findOrFail($id);
+        }
+
+        if ($is_hr_manager) {
+            $this->userCanOrFail(PermissionEnum::DeleteOwnJobs);
+            $job = Job::where('user_id', $this->userId())
+                ->findOrFail($id);
+        }
+
+        $job->delete();
+
+        return back()->with('message', 'Job deleted successfully');
     }
 }

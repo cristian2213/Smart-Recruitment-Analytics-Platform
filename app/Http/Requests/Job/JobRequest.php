@@ -2,18 +2,13 @@
 
 namespace App\Http\Requests\Job;
 
+use App\Enums\Job\JobPlacement;
+use App\Enums\Job\JobStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class JobRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -21,15 +16,32 @@ class JobRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'location' => ['required', 'string', 'max:255'],
-            'skills' => ['required', 'string', 'max:255'],
-            'salary' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'placement' => ['required', 'string', 'max:255'],
-            'recruiter_id' => ['required', 'integer'],
-        ];
+        $method = $this->method();
+
+        if ($method === 'POST') {
+            return [
+                'title' => ['required', 'string', 'max:255'],
+                'description' => ['nullable', 'string'],
+                'location' => ['required', 'string', 'max:255'],
+                'skills' => ['required', 'json'],
+                'salary' => ['required', 'numeric', 'min:200'],
+                'status' => ['required', Rule::enum(JobStatus::class)],
+                'placement' => ['required', Rule::enum(JobPlacement::class)],
+                'recruiter_id' => ['required', 'exists:users,id'],
+            ];
+        }
+
+        if ($method === 'PUT') {
+            return [
+                'title' => ['required', 'string', 'max:255'],
+                'description' => ['nullable', 'string'],
+                'location' => ['required', 'string', 'max:255'],
+                'skills' => ['required', 'json'],
+                'salary' => ['required', 'numeric', 'min:200'],
+                'status' => ['required', Rule::enum(JobStatus::class)],
+                'placement' => ['required', Rule::enum(JobPlacement::class)],
+                'recruiter_id' => ['required', 'exists:users,id'],
+            ];
+        }
     }
 }

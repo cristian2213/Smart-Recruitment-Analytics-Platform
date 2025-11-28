@@ -7,55 +7,60 @@ use App\Enums\User\RoleEnum;
 
 class PermissionService
 {
-    protected array $rolePermissions = [
-        RoleEnum::Admin->value => [
-            PermissionEnum::ViewUsers,
-            PermissionEnum::ViewShowUser,
-            PermissionEnum::ViewEditUser,
-            PermissionEnum::CreateUsers,
-            PermissionEnum::ReadUsers,
-            PermissionEnum::UpdateUsers,
-            PermissionEnum::DeleteUsers,
-            PermissionEnum::DownloadUsers,
+    protected array $rolePermissions;
 
-            PermissionEnum::ViewJobs,
-            PermissionEnum::CreateJobs,
-            PermissionEnum::ReadJobs,
-            PermissionEnum::UpdateJobs,
-            PermissionEnum::DeleteJobs,
-        ],
+    public function __construct()
+    {
+        $this->rolePermissions = [
+            RoleEnum::Admin->value => [
+                PermissionEnum::ViewUsers,
+                PermissionEnum::ViewShowUser,
+                PermissionEnum::ViewEditUser,
+                PermissionEnum::CreateUsers,
+                PermissionEnum::ReadUsers,
+                PermissionEnum::UpdateUsers,
+                PermissionEnum::DeleteUsers,
+                PermissionEnum::DownloadUsers,
 
-        RoleEnum::HRManager->value => [
-            PermissionEnum::ViewUsers,
-            PermissionEnum::ViewShowUser,
-            PermissionEnum::ViewEditUser,
-            PermissionEnum::CreateUsers,
-            PermissionEnum::ReadOwnUsers,
-            PermissionEnum::UpdateOwnUsers,
-            PermissionEnum::DeleteOwnUsers,
-            PermissionEnum::DownloadOwnUsers,
+                PermissionEnum::ViewJobs,
+                PermissionEnum::CreateJobs,
+                PermissionEnum::ReadJobs,
+                PermissionEnum::UpdateJobs,
+                PermissionEnum::DeleteJobs,
+            ],
 
-            PermissionEnum::ViewJobs,
-            PermissionEnum::CreateOwnJobs,
-            PermissionEnum::ReadOwnJobs,
-            PermissionEnum::UpdateOwnJobs,
-            PermissionEnum::DeleteOwnJobs,
-        ],
+            RoleEnum::HRManager->value => [
+                PermissionEnum::ViewUsers,
+                PermissionEnum::ViewShowUser,
+                PermissionEnum::ViewEditUser,
+                PermissionEnum::CreateUsers,
+                PermissionEnum::ReadOwnUsers,
+                PermissionEnum::UpdateOwnUsers,
+                PermissionEnum::DeleteOwnUsers,
+                PermissionEnum::DownloadOwnUsers,
 
-        RoleEnum::Recruiter->value => [
-            PermissionEnum::ViewJobs,
-            PermissionEnum::ReadJobs,
-            PermissionEnum::UpdateJobsStatus,
-        ],
+                PermissionEnum::ViewJobs,
+                PermissionEnum::CreateOwnJobs,
+                PermissionEnum::ReadOwnJobs,
+                PermissionEnum::UpdateOwnJobs,
+                PermissionEnum::DeleteOwnJobs,
+            ],
 
-        RoleEnum::Applicant->value => [
-            PermissionEnum::ViewApplications,
-            PermissionEnum::CreateApplications,
-            PermissionEnum::ReadOwnApplications,
-            PermissionEnum::UpdateOwnApplications,
-            PermissionEnum::DeleteOwnApplications,
-        ],
-    ];
+            RoleEnum::Recruiter->value => [
+                PermissionEnum::ViewJobs,
+                PermissionEnum::ReadJobs,
+                PermissionEnum::UpdateJobsStatus,
+            ],
+
+            RoleEnum::Applicant->value => [
+                PermissionEnum::ViewApplications,
+                PermissionEnum::CreateApplications,
+                PermissionEnum::ReadOwnApplications,
+                PermissionEnum::UpdateOwnApplications,
+                PermissionEnum::DeleteOwnApplications,
+            ],
+        ];
+    }
 
     public function getRoles(): array
     {

@@ -13,4 +13,5 @@ enum JobPlacement: string
 {
     case Remote = 'remote';
     case OnSite = 'onsite';
+    case Hybrid = 'hybrid';
 }

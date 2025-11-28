@@ -21,8 +21,10 @@ import {
 } from '@/components/ui/select'
 import { type DynamicFormInputProps } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { Controller, useForm, type UseFormReturn } from 'react-hook-form'
 import * as z from 'zod'
+import { Badge } from './ui/badge'
 
 interface FormDataProps<TFormSchema> {
   inputs: DynamicFormInputProps[]
@@ -45,6 +47,7 @@ function DynamicForm<TFormSchema extends z.ZodType<any>>({
     resolver: zodResolver(schema),
     defaultValues,
   })
+  const [badges, setBadges] = useState<string[]>([])
 
   const createForm = () => {
     return inputs.map((input) => {
@@ -57,6 +60,47 @@ function DynamicForm<TFormSchema extends z.ZodType<any>>({
         options,
         fileOpts,
       } = input
+
+      if (element === 'multi-input') {
+        return (
+          <Controller
+            key={name}
+            name={name}
+            control={form.control}
+            render={({ field, fieldState }) => {
+              // console.log('field', field)
+              // console.log(form)
+              // setBadges(field.value.split(','))
+              return (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                  <Input
+                    {...field}
+                    id={name}
+                    type={type}
+                    aria-invalid={fieldState.invalid}
+                    {...(placeholder ? { placeholder } : {})}
+                    onChange={(e) => {
+                      const val = e.target.value
+
+                      const badge = val.split(',').map((item) => item.trim())
+                      setBadges(badge)
+                      field.onChange(val)
+                    }}
+                  />
+                  {/* Badge */}
+                  <div className="flex flex-wrap gap-2">
+                    {badges.map((badge) => (
+                      <Badge key={badge}>{badge}</Badge>
+                    ))}
+                  </div>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )
+            }}
+          />
+        )
+      }
 
       if (element === 'input') {
         if (type === 'file') {

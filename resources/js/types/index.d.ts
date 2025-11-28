@@ -98,7 +98,7 @@ export interface Job {
   skills: string
   creator: Pick<User, 'id' | 'name' | 'avatar'>
   recruiter: Pick<User, 'id' | 'name' | 'avatar'>
-  placement: string
+  placement: 'remote' | 'onsite' | 'hybrid'
   created_at: string
   updated_at: string
   deleted_at: string | null
@@ -132,7 +132,7 @@ export interface FileOpts {
 
 export interface DynamicFormInputProps {
   name: string
-  htmlElement: 'input' | 'textarea' | 'select'
+  htmlElement: 'input' | 'textarea' | 'select' | 'multi-input'
   type?: 'text' | 'password' | 'email' | 'file' | 'number'
   label: string
   placeholder?: string

@@ -30,8 +30,6 @@ class Job extends Model
 
     protected $hidden = [];
 
-    protected $casts = [];
-
     // ***********************
     // RELATIONSHIPS
     // ***********************

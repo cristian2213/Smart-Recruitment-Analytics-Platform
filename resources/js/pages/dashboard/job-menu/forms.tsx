@@ -2,15 +2,26 @@ import { type DynamicFormInputProps } from '@/types'
 
 import * as z from 'zod'
 
-const statusEnum = z.enum(['draft', 'published', 'closed'])
-
 const createJobValidation = z.object({
-  title: z.string().min(2, 'Title must be at least 2 characters.'),
-  location: z.string().min(2, 'Location must be at least 2 characters.'),
-  skills: z.string().min(1, 'Skills is required.'),
-  salary: z.string().min(1, 'Salary is required.'),
-  status: statusEnum,
-  placement: z.string().min(1, 'Placement is required.'),
+  title: z.string().min(10, 'Title must be at least 10 characters.'),
+  location: z
+    .string()
+    .min(2, 'Location must be at least 2 characters.')
+    .regex(
+      /^[A-Za-z0-9\sáéíóúÁÉÍÓÚñÑ-]+\/[A-Za-z0-9\sáéíóúÁÉÍÓÚñÑ-]+$/,
+      'Location must be in the format: Department/City',
+    ),
+  // format: "skill1,skill2,skill3", don't allow , at the end
+  skills: z
+    .string()
+    .min(1, 'Skills is required.')
+    .regex(/^[^,]+(,[^,]+)*$/, 'Skills must be in the format: skill1,skill2,skill3'),
+  salary: z
+    .string()
+    .min(1, 'Salary is required.')
+    .regex(/^[0-9]+$/, 'Salary must be a number.'),
+  status: z.enum(['draft', 'published', 'closed']),
+  placement: z.enum(['remote', 'onsite', 'hybrid']),
   recruiter_id: z.string().min(1, 'Recruiter is required.'),
 })
 
@@ -35,8 +46,7 @@ const createFormInputs: DynamicFormInputProps[] = [
     name: 'skills',
     label: 'Skills',
     placeholder: 'Enter skills',
-    htmlElement: 'input',
-    type: 'text',
+    htmlElement: 'multi-input',
   },
   {
     name: 'salary',
@@ -61,8 +71,12 @@ const createFormInputs: DynamicFormInputProps[] = [
     name: 'placement',
     label: 'Placement',
     placeholder: 'Enter placement',
-    htmlElement: 'input',
-    type: 'text',
+    htmlElement: 'select',
+    options: [
+      { value: 'remote', label: 'Remote' },
+      { value: 'onsite', label: 'Onsite' },
+      { value: 'hybrid', label: 'Hybrid' },
+    ],
   },
   {
     name: 'recruiter_id',

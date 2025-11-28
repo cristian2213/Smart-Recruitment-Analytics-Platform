@@ -14,6 +14,7 @@ import { handleHttpErrors, handleHttpSuccess } from '@/lib/http'
 import { type BreadcrumbItem, type JobFormOptions, type User } from '@/types'
 import { Head, router } from '@inertiajs/react'
 import { useMemo, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import {
   updateFormInputs as jobInputs,
   updateJobValidation as jobUpdateSchema,
@@ -66,16 +67,16 @@ export default function Job({ job, edit, formOptions }: JobProps) {
     })
   }, [formOptions.recruiters])
 
-  const handleSubmit = (data: JobFormOptions) => {
+  const handleSubmit = (data: JobFormOptions, form: UseFormReturn) => {
     const payload: Partial<JobFormOptions> = {
       title: data.title,
-      skills: data.skills,
+      description,
+      skills: JSON.stringify(data.skills),
       location: data.location,
       salary: data.salary,
       status: data.status,
       placement: data.placement,
       recruiter_id: data.recruiter_id,
-      description,
     }
 
     if (edit) {
@@ -90,6 +91,7 @@ export default function Job({ job, edit, formOptions }: JobProps) {
         replace: true,
         onSuccess: (res) => {
           handleHttpSuccess(res)
+          // form.reset()
         },
         onError: (errors) => {
           handleHttpErrors(errors)
